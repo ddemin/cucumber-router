@@ -1,0 +1,17 @@
+apply plugin: 'java'
+
+group theGroup
+version theVersion
+sourceCompatibility = theSourceCompatibility
+
+apply from: 'gradle/script/nebula.gradle'
+apply from: 'gradle/script/csa.gradle'
+apply from: 'gradle/script/publishing.gradle'
+apply from: 'gradle/script/app.gradle'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}

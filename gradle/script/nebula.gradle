@@ -1,0 +1,22 @@
+// https://github.com/nebula-plugins/gradle-lint-plugin
+// https://github.com/nebula-plugins/gradle-dependency-lock-plugin
+
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
+        classpath 'com.netflix.nebula:gradle-dependency-lock-plugin:latest.release'
+    }
+}
+
+allprojects {
+    apply plugin: com.netflix.nebula.lint.plugin.GradleLintPlugin
+    apply plugin: nebula.plugin.dependencylock.DependencyLockPlugin
+    gradleLint.criticalRules = [ 'overridden-dependency-version' ]
+    gradleLint.rules = [
+            'all-dependency',
+            'dependency-parentheses',
+            'dependency-tuple',
+            'duplicate-dependency-class'
+    ]
+}

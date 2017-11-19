@@ -1,0 +1,56 @@
+// https://github.com/bmuschko/gradle-nexus-plugin
+// TODO Think about...
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:latest.release'
+    }
+}
+
+apply plugin: com.bmuschko.gradle.nexus.NexusPlugin
+
+modifyPom {
+    project {
+        name 'Tests threads router for Cucumber JVM'
+        description 'TBD'
+        url 'TBD'
+        inceptionYear '2017'
+
+        scm {
+            url 'TBD'
+            connection 'TBD'
+            developerConnection 'TBD'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'ddemin'
+                name 'Dmitrii Demin'
+                email 'demindm58@gmail.com'
+            }
+        }
+    }
+}
+
+extraArchive {
+    javadoc = true
+    sources = true
+    tests = false
+}
+
+nexus {
+    sign = true
+    repositoryUrl = System.getProperty("nexus.releases", "")
+    snapshotRepositoryUrl = System.getProperty("nexus.snapshots", "")
+}

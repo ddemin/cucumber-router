@@ -1,0 +1,51 @@
+enum CsaMode {
+    DISABLED, XML, HTML
+}
+
+CsaMode csaMode = CsaMode.valueOf(System.getProperty("gradle.csa", "html").toUpperCase())
+
+if (csaMode == CsaMode.DISABLED) return
+
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+apply plugin: 'pmd'
+
+jar {
+    dependsOn ':pmdMain', ':findbugsMain', ':checkstyleMain'
+}
+
+test {
+    dependsOn ':pmdMain', ':findbugsMain', ':checkstyleMain'
+}
+
+checkstyle {
+    toolVersion = "8.4"
+}
+
+tasks.withType(Checkstyle) {
+    source = fileTree('src')
+    config = resources.text.fromFile('config/checkstyle/config.xml')
+    reports {
+        xml.enabled csaMode == CsaMode.XML
+        html.enabled csaMode == CsaMode.HTML
+    }
+    ignoreFailures = true
+}
+
+tasks.withType(FindBugs) {
+    classes = fileTree('build/classes/')
+    source = fileTree('src')
+    reports {
+        xml.enabled csaMode == CsaMode.XML
+        html.enabled csaMode == CsaMode.HTML
+    }
+}
+
+tasks.withType(Pmd) {
+    source = fileTree('src')
+    include '**/*.java'
+    reports {
+        xml.enabled csaMode == CsaMode.XML
+        html.enabled csaMode == CsaMode.HTML
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "checkstyle": {
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.4"
+        }
+    },
+    "findbugs": {
+        "com.google.code.findbugs:findbugs": {
+            "locked": "3.0.1"
+        }
+    },
+    "pmd": {
+        "net.sourceforge.pmd:pmd-java": {
+            "locked": "5.6.1"
+        }
+    }
+}
