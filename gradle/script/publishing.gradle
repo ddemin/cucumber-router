@@ -1,5 +1,4 @@
 // https://github.com/bmuschko/gradle-nexus-plugin
-// TODO Think about...
 
 buildscript {
     repositories {
@@ -53,4 +52,5 @@ nexus {
     sign = true
     repositoryUrl = System.getProperty("nexus.releases", "")
     snapshotRepositoryUrl = System.getProperty("nexus.snapshots", "")
+    // Start gradle with -PnexusUsername=someuser  -PnexusPassword=somepass
 }
