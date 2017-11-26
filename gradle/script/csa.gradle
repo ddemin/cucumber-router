@@ -14,10 +14,6 @@ jar {
     dependsOn ':pmdMain', ':findbugsMain', ':checkstyleMain'
 }
 
-test {
-    dependsOn ':pmdMain', ':findbugsMain', ':checkstyleMain'
-}
-
 checkstyle {
     toolVersion = "8.4"
 }

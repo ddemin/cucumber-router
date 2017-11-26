@@ -1,0 +1,18 @@
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath "io.qameta.allure:allure-gradle:2.5"
+    }
+}
+
+apply plugin: io.qameta.allure.gradle.AllurePlugin
+
+allure {
+    version = '2.4.1'
+    autoconfigure = false
+    aspectjweaver = true
+}
