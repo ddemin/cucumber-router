@@ -9,7 +9,9 @@ import java.nio.file.Path;
 import java.util.Properties;
 import lombok.Data;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 public class Environment {
 
@@ -24,6 +26,7 @@ public class Environment {
    */
   @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   public Environment(@NonNull Path pathToPropertiesDir) {
+    log.debug("Create environment based on folder: {}", pathToPropertiesDir);
     this.pathToPropertiesDir = pathToPropertiesDir;
     this.name = pathToPropertiesDir.getFileName().toString();
     this.properties = new Properties(System.getProperties());

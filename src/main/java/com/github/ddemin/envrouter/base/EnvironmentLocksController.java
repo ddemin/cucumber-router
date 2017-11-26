@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Created by Dmitrii Demin on 18.09.2017.
  */
-@Slf4j(topic = "td")
+@Slf4j
 public class EnvironmentLocksController {
 
   private final Map<Environment, Integer> testDatasLockMap;
@@ -31,6 +31,7 @@ public class EnvironmentLocksController {
       @NonNull Supplier<Set<Environment>> envsSupplier,
       int maxThreadsPerTestData
   ) {
+    log.debug("Create lock controller...");
     this.testDatasLockMap = new ConcurrentHashMap<>(
         Maps.asMap(envsSupplier.get(), e -> maxThreadsPerTestData)
     );
@@ -47,6 +48,7 @@ public class EnvironmentLocksController {
       @NonNull Environment env,
       int maxThreadsPerTestData
   ) {
+    log.debug("Create lock controller for one environment: {}", env);
     this.testDatasLockMap = new HashMap<>();
     this.testDatasLockMap.put(env, maxThreadsPerTestData);
     this.maxThreadsPerTestData = maxThreadsPerTestData;
@@ -108,6 +110,7 @@ public class EnvironmentLocksController {
     if (!isAvailable(env)) {
       return false;
     }
+    log.debug("Lock environment: {}", env);
     testDatasLockMap.put(env, testDatasLockMap.get(env) - 1);
     return true;
   }
@@ -119,6 +122,7 @@ public class EnvironmentLocksController {
    */
   @Synchronized
   public void release(@NonNull Environment env) {
+    log.debug("Release environment: {}", env);
     int envFreeThreads = testDatasLockMap.get(env);
     if (envFreeThreads < maxThreadsPerTestData) {
       testDatasLockMap.put(env, envFreeThreads + 1);

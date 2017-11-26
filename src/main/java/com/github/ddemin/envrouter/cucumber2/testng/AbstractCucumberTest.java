@@ -42,6 +42,7 @@ public abstract class AbstractCucumberTest implements ITest {
   private static final EnvironmentLocksController ENVS_CONTROLLER = new EnvironmentLocksController(
       () -> {
         try {
+          log.debug("Find environments directiories in {}", RouterConfig.ENVS_DIRECTORY);
           return FileSystemUtils.getSubdirectories(
               AbstractCucumberTest.class
                   .getClassLoader()
@@ -88,6 +89,7 @@ public abstract class AbstractCucumberTest implements ITest {
    */
   @BeforeMethod(alwaysRun = true)
   public void lockEnvAndPrepareFeature() {
+    log.info("Try to find untested feature and lock appropriate env...");
     envLock.set(
         await()
             .timeout(RouterConfig.LOCK_TIMEOUT_MS, TimeUnit.MILLISECONDS)
@@ -113,11 +115,13 @@ public abstract class AbstractCucumberTest implements ITest {
   @AfterMethod(alwaysRun = true)
   public void finishCucumberRunner() {
     if (cukeRunner.get() != null) {
+      log.debug("Finish current Cucumber runner");
       cukeRunner.get().finish();
     }
   }
 
   protected void runNextFeature() {
+    log.debug("Try to run feature test. Lock info: {}", envLock.get());
     Environment env = envLock.get().getEnvironment();
     FeatureWrapper feature = envLock.get().getTargetEntity();
     LockStatus lockStatus = envLock.get().getLockStatus();
@@ -132,6 +136,7 @@ public abstract class AbstractCucumberTest implements ITest {
         }
         break;
       default:
+        log.warn("Lock unsuccessful. Process failure...");
         processFailedLocking(envLock.get());
     }
   }
@@ -148,16 +153,21 @@ public abstract class AbstractCucumberTest implements ITest {
         Environment envForTest = null;
 
         if (ensQueues.featuresInAllQueues() <= 0) {
+          log.error("No any features in queues");
           return new EnvironmentLock<>(LockStatus.FAILURE_NO_TARGET_ENTITIES);
         } else if (queuesForUndefinedEnvs.size() > 0) {
+          FeatureWrapper featureWrapper = queuesForUndefinedEnvs.get(0).getValue().poll();
+          log.warn("Feature for undefined found: {}", featureWrapper);
           return new EnvironmentLock<>(
               null,
-              queuesForUndefinedEnvs.get(0).getValue().poll(),
+              featureWrapper,
               LockStatus.FAILURE_UNDEFINED_ENV
           );
         } else if (availableEnvs.size() <= 0) {
+          log.info("No any available environments");
           return new EnvironmentLock<>(LockStatus.FAILURE_NO_AVAILABLE);
         } else {
+          log.debug("Search untested features for available environments...");
           for (Environment env : availableEnvs) {
             featureForTest = ensQueues.pollFeatureFor(env.getName());
             if (featureForTest != null) {
@@ -168,8 +178,14 @@ public abstract class AbstractCucumberTest implements ITest {
         }
 
         if (featureForTest != null && ENVS_CONTROLLER.lock(envForTest)) {
+          log.info(
+              "Untested feature is found: {} and environment is locked: {}",
+              featureForTest,
+              envForTest
+          );
           return new EnvironmentLock<>(envForTest, featureForTest, LockStatus.SUCCESS_LOCKED);
         } else {
+          log.error("Something goes wrong");
           return new EnvironmentLock<>(LockStatus.FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS);
         }
       } catch (NullPointerException ex) {
@@ -192,6 +208,7 @@ public abstract class AbstractCucumberTest implements ITest {
                 .collect(Collectors.toList())
         )
     );
+    log.info("Save all features to queues. Processed {}", ensQueues.featuresInAllQueues());
     return ensQueues.featuresInAllQueues();
   }
 

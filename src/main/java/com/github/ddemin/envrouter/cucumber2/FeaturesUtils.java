@@ -28,10 +28,12 @@ public class FeaturesUtils {
 
   /**
    * Wrap cucumber-jvm feature and parse its priority tag and required environment tag.
+   *
    * @param feature cucumber-jvm feature
    * @return list of wrapped features
    */
   public static FeatureWrapper wrapFeature(CucumberFeature feature) {
+    log.debug("Wrap feature: {}", feature.getUri());
     return new FeatureWrapper(
         feature,
         getFeatureRequiredEnvironment(feature),
@@ -41,10 +43,15 @@ public class FeaturesUtils {
 
   /**
    * Wrap cucumber-jvm features and parse its priority tag and required environment tag.
+   *
    * @param features cucumber-jms features
    * @return list of wrapped features
    */
   public static List<FeatureWrapper> wrapFeatures(List<CucumberFeature> features) {
+    log.info(
+        "Wrap features: {}",
+        features.stream().map(CucumberFeature::getUri).collect(Collectors.toList())
+    );
     return features.stream()
         .map(FeaturesUtils::wrapFeature)
         .collect(Collectors.toList());
@@ -52,6 +59,7 @@ public class FeaturesUtils {
 
   /**
    * Get list of queues that have required environments that don't exist.
+   *
    * @param queuesGroup queues of wrapped features that grouped by environments name
    * @param definedEnvs set of environments that exist now
    * @return list of queues for environments that don't exist (weren't provided)
@@ -60,6 +68,7 @@ public class FeaturesUtils {
       FeaturesQueues queuesGroup,
       Set<Environment> definedEnvs
   ) {
+    log.debug("Get all queues for undefined environments...");
     return queuesGroup.getQueuesMap().entrySet().stream()
         .filter(
             entry ->

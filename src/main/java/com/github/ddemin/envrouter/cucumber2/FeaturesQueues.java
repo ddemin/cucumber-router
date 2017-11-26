@@ -51,6 +51,8 @@ public class FeaturesQueues {
    * @return extract feature from environment queue
    */
   public FeatureWrapper pollFeatureFor(String envName) {
+    log.debug("Try to poll feature for environment: {}", envName);
+
     FeatureWrapper chosenFeature;
     Queue<FeatureWrapper> queueForEnv = getQueueFor(envName);
     Queue<FeatureWrapper> queueForAnyEnv = getQueueFor(ANY_ENVIRONMENT);
@@ -59,8 +61,10 @@ public class FeaturesQueues {
       log.warn("No feature found for env-s: ANY & {}", envName);
       chosenFeature = null;
     } else if (queueForEnv == null) {
+      log.debug("Try to poll feature from queue for ANY environment");
       chosenFeature = queueForAnyEnv.poll();
     } else if (queueForAnyEnv == null) {
+      log.debug("Try to poll feature from queue for environment {}", envName);
       chosenFeature = queueForEnv.poll();
     } else {
       chosenFeature =
@@ -69,6 +73,7 @@ public class FeaturesQueues {
               : queueForAnyEnv.poll();
     }
 
+    log.debug("Feature was pulled from queue: {}", chosenFeature);
     return chosenFeature;
   }
 
