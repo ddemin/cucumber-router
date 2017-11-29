@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +33,7 @@ public class FeaturesUtils {
    * @param feature cucumber-jvm feature
    * @return list of wrapped features
    */
-  public static FeatureWrapper wrapFeature(CucumberFeature feature) {
+  public static FeatureWrapper wrapFeature(@NonNull CucumberFeature feature) {
     log.debug("Wrap feature: {}", feature.getUri());
     return new FeatureWrapper(
         feature,
@@ -47,7 +48,7 @@ public class FeaturesUtils {
    * @param features cucumber-jms features
    * @return list of wrapped features
    */
-  public static List<FeatureWrapper> wrapFeatures(List<CucumberFeature> features) {
+  public static List<FeatureWrapper> wrapFeatures(@NonNull List<CucumberFeature> features) {
     log.info(
         "Wrap features: {}",
         features.stream().map(CucumberFeature::getUri).collect(Collectors.toList())
@@ -65,8 +66,8 @@ public class FeaturesUtils {
    * @return list of queues for environments that don't exist (weren't provided)
    */
   public static List<Entry<String, Queue<FeatureWrapper>>> getQueuesForUndefinedEnvs(
-      FeaturesQueues queuesGroup,
-      Set<Environment> definedEnvs
+      @NonNull FeaturesQueues queuesGroup,
+      @NonNull Set<Environment> definedEnvs
   ) {
     log.debug("Get all queues for undefined environments...");
     return queuesGroup.getQueuesMap().entrySet().stream()
@@ -83,20 +84,21 @@ public class FeaturesUtils {
         .collect(Collectors.toList());
   }
 
-  private static int getFeaturePriority(CucumberFeature feature) {
+  private static int getFeaturePriority(@NonNull CucumberFeature feature) {
     return extractTagEnding(feature, CUKE_PRIORITY_TAG)
         .filter(priorityStr -> priorityStr.matches("[\\d]+"))
         .map(Integer::parseInt)
         .orElse(Integer.MAX_VALUE);
   }
 
-  private static String getFeatureRequiredEnvironment(CucumberFeature feature) {
+  private static String getFeatureRequiredEnvironment(@NonNull CucumberFeature feature) {
     return extractTagEnding(feature, CUKE_ENV_TAG)
         .orElse(RouterConfig.ENV_DEFAULT == null ? ANY_ENVIRONMENT : RouterConfig.ENV_DEFAULT)
         .toLowerCase();
   }
 
-  private static Optional<String> extractTagEnding(CucumberFeature feature, String str) {
+  private static Optional<String> extractTagEnding(@NonNull CucumberFeature feature,
+      @NonNull String str) {
     return feature.getGherkinFeature().getFeature().getTags().stream()
         .filter(tag -> tag.getName().startsWith(str))
         .map(tag -> StringUtils.substringAfterLast(tag.getName(), str))

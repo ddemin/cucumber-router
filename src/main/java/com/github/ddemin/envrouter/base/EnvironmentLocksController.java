@@ -141,6 +141,7 @@ public class EnvironmentLocksController {
 
   /**
    * Get environment from map by name.
+   *
    * @param envName environment name
    * @return environment object
    */

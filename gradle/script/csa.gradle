@@ -10,38 +10,50 @@ apply plugin: 'checkstyle'
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
 
-jar {
-    dependsOn ':pmdMain', ':findbugsMain', ':checkstyleMain'
-}
-
 checkstyle {
     toolVersion = "8.4"
 }
 
 tasks.withType(Checkstyle) {
-    source = fileTree('src')
+    ignoreFailures false
+    setMaxErrors(0)
+    setMaxWarnings(0)
+    source = fileTree('src/main')
     config = resources.text.fromFile('config/checkstyle/config.xml')
     reports {
         xml.enabled csaMode == CsaMode.XML
         html.enabled csaMode == CsaMode.HTML
     }
-    ignoreFailures = true
+}
+
+checkstyleTest {
+    ignoreFailures true
+    source = fileTree('src/test')
 }
 
 tasks.withType(FindBugs) {
-    classes = fileTree('build/classes/')
-    source = fileTree('src')
+    classes = fileTree('build/classes/java/main')
+    source = fileTree('src/main')
     reports {
         xml.enabled csaMode == CsaMode.XML
         html.enabled csaMode == CsaMode.HTML
     }
 }
 
+findbugsTest {
+    classes = fileTree('build/classes/java/test')
+    source = fileTree('src/test')
+}
+
 tasks.withType(Pmd) {
-    source = fileTree('src')
+    source = fileTree('src/main')
     include '**/*.java'
     reports {
         xml.enabled csaMode == CsaMode.XML
         html.enabled csaMode == CsaMode.HTML
     }
+}
+
+pmdTest {
+    source = fileTree('src/test')
 }

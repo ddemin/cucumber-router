@@ -5,6 +5,7 @@ import static java.lang.String.format;
 import cucumber.runtime.model.CucumberFeature;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,7 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class FeatureWrapper {
 
+  @NonNull
   private CucumberFeature feature;
+  @NonNull
   private String requiredEnvironmentName;
   private int priority;
 

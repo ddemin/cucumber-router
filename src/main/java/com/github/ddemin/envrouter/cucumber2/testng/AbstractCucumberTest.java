@@ -30,9 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.ITest;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 
@@ -59,13 +57,12 @@ public abstract class AbstractCucumberTest implements ITest {
   );
   private static final Map<Class<? extends AbstractCucumberTest>, FeaturesQueues> FEATURES_QUEUES
       = new HashMap<>();
-
-  protected abstract void processFailedLocking(EnvironmentLock<FeatureWrapper> lock);
-
   private final ThreadLocal<TestNGCucumberRunner> cukeRunner
       = ThreadLocal.withInitial(() -> new TestNGCucumberRunner(this.getClass()));
   private final ThreadLocal<EnvironmentLock<FeatureWrapper>> envLock
       = ThreadLocal.withInitial(() -> null);
+
+  protected abstract void processFailedLocking(EnvironmentLock<FeatureWrapper> lock);
 
   @Override
   public String getTestName() {

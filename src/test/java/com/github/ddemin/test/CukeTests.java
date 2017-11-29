@@ -21,7 +21,7 @@ public class CukeTests extends AbstractCucumberTest {
   public CukeTests() {
   }
 
-  @Test(enabled = true)
+  @Test(enabled = true, groups = "demo")
   public void runTest() {
     super.runNextFeature();
   }
@@ -43,7 +43,7 @@ public class CukeTests extends AbstractCucumberTest {
         );
         throw new RuntimeException(errorMessage);
       case FAILURE_NO_TARGET_ENTITIES:
-        errorMessage =  "No any waiting feature was found for all available environments";
+        errorMessage = "No any waiting feature was found for all available environments";
         saveAsBrokenTest(
             "Tests router global error",
             errorMessage
