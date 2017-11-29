@@ -67,15 +67,9 @@ task demo(type: Test) {
 
 jacocoTestReport {
     reports {
-        xml {
-            enabled true
-            destination "${buildDir}/reports/jacoco/jacoco.xml"
-        }
+        xml.enabled true
         csv.enabled false
-        html {
-            enabled true
-            destination "${buildDir}/jacocoHtml"
-        }
+        html.enabled true
     }
 }
 
