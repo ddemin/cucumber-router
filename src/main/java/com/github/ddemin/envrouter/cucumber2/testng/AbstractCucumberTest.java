@@ -1,32 +1,19 @@
 package com.github.ddemin.envrouter.cucumber2.testng;
 
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.Is.is;
-
 import com.github.ddemin.envrouter.RouterConfig;
-import com.github.ddemin.envrouter.base.EntitiesQueues;
 import com.github.ddemin.envrouter.base.Environment;
 import com.github.ddemin.envrouter.base.EnvironmentLock;
 import com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus;
-import com.github.ddemin.envrouter.base.EnvironmentLocksController;
-import com.github.ddemin.envrouter.base.EnvironmentsContext;
+import com.github.ddemin.envrouter.base.EnvironmentsUtils;
+import com.github.ddemin.envrouter.base.EnvsLocksController;
+import com.github.ddemin.envrouter.base.TestEntitiesQueues;
 import com.github.ddemin.envrouter.cucumber2.FeatureWrapper;
 import com.github.ddemin.envrouter.cucumber2.FeaturesUtils;
-import com.github.ddemin.testutil.io.FileSystemUtils;
 import cucumber.api.testng.CucumberFeatureWrapper;
 import cucumber.api.testng.TestNGCucumberRunner;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.ITest;
@@ -37,32 +24,16 @@ import org.testng.annotations.DataProvider;
 @Slf4j
 public abstract class AbstractCucumberTest implements ITest {
 
-  private static final EnvironmentLocksController ENVS_CONTROLLER = new EnvironmentLocksController(
-      () -> {
-        try {
-          log.debug("Find environments directiories in {}", RouterConfig.ENVS_DIRECTORY);
-          return FileSystemUtils.getSubdirectories(
-              AbstractCucumberTest.class
-                  .getClassLoader()
-                  .getResource(RouterConfig.ENVS_DIRECTORY)
-                  .toURI()
-          ).stream()
-              .map(Environment::new)
-              .collect(Collectors.toSet());
-        } catch (URISyntaxException ex) {
-          throw new RuntimeException(ex);
-        }
-      },
+  private static final EnvsLocksController<FeatureWrapper> CONTROLLER = new EnvsLocksController<>(
+      () -> EnvironmentsUtils.initAllFromDirectory(RouterConfig.ENVS_DIRECTORY),
       RouterConfig.ENV_THREADS_MAX
   );
-  private static final Map<
-      Class<? extends AbstractCucumberTest>,
-      EntitiesQueues<FeatureWrapper>
-      > FEATURES_QUEUES = new HashMap<>();
+  private static final Map<Class<? extends AbstractCucumberTest>, TestEntitiesQueues<FeatureWrapper>> QUEUES
+      = new HashMap<>();
+
+  private final ThreadLocal<EnvironmentLock<FeatureWrapper>> envLock = ThreadLocal.withInitial(() -> null);
   private final ThreadLocal<TestNGCucumberRunner> cukeRunner
       = ThreadLocal.withInitial(() -> new TestNGCucumberRunner(this.getClass()));
-  private final ThreadLocal<EnvironmentLock<FeatureWrapper>> envLock
-      = ThreadLocal.withInitial(() -> null);
 
   protected abstract void processFailedLocking(EnvironmentLock<FeatureWrapper> lock);
 
@@ -89,23 +60,7 @@ public abstract class AbstractCucumberTest implements ITest {
   @BeforeMethod(alwaysRun = true)
   public void lockEnvAndPrepareFeature() {
     log.info("Try to find untested feature and lock appropriate env...");
-    envLock.set(
-        await()
-            .timeout(RouterConfig.LOCK_TIMEOUT_MS, TimeUnit.MILLISECONDS)
-            .pollInterval(1, TimeUnit.SECONDS)
-            .until(
-                this::lockEnvAndSelectFeature,
-                hasProperty(
-                    "lockStatus",
-                    not(
-                        anyOf(
-                            is(LockStatus.FAILURE_NO_AVAILABLE),
-                            is(LockStatus.FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS)
-                        )
-                    )
-                )
-            )
-    );
+    envLock.set(CONTROLLER.findUntestedEntityAndAssignEnv(getEnvsQueuesForThisClass()));
   }
 
   /**
@@ -120,18 +75,18 @@ public abstract class AbstractCucumberTest implements ITest {
   }
 
   protected void runNextFeature() {
-    log.debug("Try to run feature test. Lock info: {}", envLock.get());
+    log.debug("Try to run feature demo. Lock info: {}", envLock.get());
     Environment env = envLock.get().getEnvironment();
     FeatureWrapper feature = envLock.get().getTargetEntity();
     LockStatus lockStatus = envLock.get().getLockStatus();
     switch (lockStatus) {
       case SUCCESS_LOCKED:
         try {
-          EnvironmentsContext.setCurrent(env);
+          EnvironmentsUtils.setCurrent(env);
           cukeRunner.get().getFeatures();
           cukeRunner.get().runCucumber(feature.getEntity());
         } finally {
-          ENVS_CONTROLLER.release(env);
+          CONTROLLER.release(env);
         }
         break;
       default:
@@ -140,63 +95,9 @@ public abstract class AbstractCucumberTest implements ITest {
     }
   }
 
-  private EnvironmentLock<FeatureWrapper> lockEnvAndSelectFeature() {
-    synchronized (AbstractCucumberTest.class) {
-      try {
-        EntitiesQueues<FeatureWrapper> ensQueues = getEnvsQueuesForThisClass();
-
-        List<Entry<String, Queue<FeatureWrapper>>> queuesForUndefinedEnvs
-            = FeaturesUtils.getQueuesForUndefinedEnvs(ensQueues, ENVS_CONTROLLER.getAll());
-        Set<Environment> availableEnvs = ENVS_CONTROLLER.getAllAvailable();
-        FeatureWrapper featureForTest = null;
-        Environment envForTest = null;
-
-        if (ensQueues.entitiesInAllQueues() <= 0) {
-          log.error("No any features in queues");
-          return new EnvironmentLock<>(LockStatus.FAILURE_NO_TARGET_ENTITIES);
-        } else if (queuesForUndefinedEnvs.size() > 0) {
-          FeatureWrapper featureWrapper = queuesForUndefinedEnvs.get(0).getValue().poll();
-          log.warn("Feature for undefined found: {}", featureWrapper);
-          return new EnvironmentLock<>(
-              null,
-              featureWrapper,
-              LockStatus.FAILURE_UNDEFINED_ENV
-          );
-        } else if (availableEnvs.size() <= 0) {
-          log.info("No any available environments");
-          return new EnvironmentLock<>(LockStatus.FAILURE_NO_AVAILABLE);
-        } else {
-          log.debug("Search untested features for available environments...");
-          for (Environment env : availableEnvs) {
-            featureForTest = ensQueues.pollEntityFor(env.getName());
-            if (featureForTest != null) {
-              envForTest = env;
-              break;
-            }
-          }
-        }
-
-        if (featureForTest != null && ENVS_CONTROLLER.lock(envForTest)) {
-          log.info(
-              "Untested feature is found: {} and environment is locked: {}",
-              featureForTest,
-              envForTest
-          );
-          return new EnvironmentLock<>(envForTest, featureForTest, LockStatus.SUCCESS_LOCKED);
-        } else {
-          log.error("Something goes wrong");
-          return new EnvironmentLock<>(LockStatus.FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS);
-        }
-      } catch (NullPointerException ex) {
-        ex.printStackTrace();
-      }
-    }
-    return null;
-  }
-
   private int initFeaturesQueues() {
-    EntitiesQueues<FeatureWrapper> ensQueues = getEnvsQueuesForThisClass();
-    ensQueues.addAll(
+    TestEntitiesQueues<FeatureWrapper> envQueues = getEnvsQueuesForThisClass();
+    envQueues.addAll(
         FeaturesUtils.wrapFeatures(
             Arrays.stream(cukeRunner.get().provideFeatures())
                 .flatMap(
@@ -207,12 +108,12 @@ public abstract class AbstractCucumberTest implements ITest {
                 .collect(Collectors.toList())
         )
     );
-    log.info("Save all features to queues. Processed {}", ensQueues.entitiesInAllQueues());
-    return ensQueues.entitiesInAllQueues();
+    log.info("Save all features to queues. Processed {}", envQueues.entitiesInAllQueues());
+    return envQueues.entitiesInAllQueues();
   }
 
-  private EntitiesQueues<FeatureWrapper> getEnvsQueuesForThisClass() {
-    return FEATURES_QUEUES.computeIfAbsent(this.getClass(), clz -> new EntitiesQueues<>());
+  private TestEntitiesQueues<FeatureWrapper> getEnvsQueuesForThisClass() {
+    return QUEUES.computeIfAbsent(this.getClass(), clz -> new TestEntitiesQueues<>());
   }
 
 }

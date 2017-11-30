@@ -1,10 +1,10 @@
-package com.github.ddemin.test.step;
+package com.github.ddemin.envrouter.demo.step;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
 import com.github.ddemin.envrouter.base.Environment;
-import com.github.ddemin.envrouter.base.EnvironmentsContext;
+import com.github.ddemin.envrouter.base.EnvironmentsUtils;
 import cucumber.api.java.en.Given;
 import io.qameta.allure.Step;
 import java.util.Properties;
@@ -21,6 +21,7 @@ public class StepDefs {
     assertThat("This assert must be successful", 7, greaterThan(6));
 
     allureStep(getProperties().getProperty("test.global"));
+    allureStep(getProperties().getProperty("test.step1"));
     sleep();
   }
 
@@ -36,7 +37,7 @@ public class StepDefs {
     sleep();
   }
 
-  @Step("This is Allure step. Global property test.global = {globProperty}")
+  @Step("This is Allure step. Global property demo.global = {globProperty}")
   private void allureStep(String globProperty) {
   }
 
@@ -45,7 +46,7 @@ public class StepDefs {
   }
 
   private Properties getProperties() {
-    Environment env = EnvironmentsContext.getCurrent();
+    Environment env = EnvironmentsUtils.getCurrent();
     return env.getProperties();
   }
 

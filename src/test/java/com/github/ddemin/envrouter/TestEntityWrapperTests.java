@@ -22,7 +22,7 @@ public class TestEntityWrapperTests {
   @SuppressFBWarnings
   @Test(expectedExceptions = NullPointerException.class)
   public void catchNpeForNullInConstructor1() {
-    new TestEntityWrapper<String>(null, "test", 1);
+    new TestEntityWrapper<String>(null, "demo", 1);
   }
 
   @SuppressFBWarnings

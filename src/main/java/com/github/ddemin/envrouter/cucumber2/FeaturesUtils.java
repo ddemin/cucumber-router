@@ -1,16 +1,11 @@
 package com.github.ddemin.envrouter.cucumber2;
 
-import static com.github.ddemin.envrouter.base.EntitiesQueues.ANY_ENVIRONMENT;
+import static com.github.ddemin.envrouter.base.TestEntitiesQueues.ANY_ENVIRONMENT;
 
 import com.github.ddemin.envrouter.RouterConfig;
-import com.github.ddemin.envrouter.base.EntitiesQueues;
-import com.github.ddemin.envrouter.base.Environment;
 import cucumber.runtime.model.CucumberFeature;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -56,32 +51,6 @@ public class FeaturesUtils {
     );
     return features.stream()
         .map(FeaturesUtils::wrapFeature)
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * Get list of queues that have required environments that don't exist.
-   *
-   * @param queuesGroup queues of wrapped features that grouped by environments name
-   * @param definedEnvs set of environments that exist now
-   * @return list of queues for environments that don't exist (weren't provided)
-   */
-  public static List<Entry<String, Queue<FeatureWrapper>>> getQueuesForUndefinedEnvs(
-      @NonNull EntitiesQueues<FeatureWrapper> queuesGroup,
-      @NonNull Set<Environment> definedEnvs
-  ) {
-    log.debug("Get all queues for undefined environments...");
-    return queuesGroup.getQueuesMap().entrySet().stream()
-        .filter(
-            entry ->
-                definedEnvs.stream()
-                    .noneMatch(
-                        confEnv ->
-                            confEnv.getName().startsWith(entry.getKey())
-                    )
-        )
-        .filter(entry -> !entry.getKey().equals(ANY_ENVIRONMENT))
-        .filter(entry -> entry.getValue().size() > 0)
         .collect(Collectors.toList());
   }
 

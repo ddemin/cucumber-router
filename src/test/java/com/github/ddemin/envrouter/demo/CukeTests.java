@@ -1,4 +1,4 @@
-package com.github.ddemin.test;
+package com.github.ddemin.envrouter.demo;
 
 import static com.github.ddemin.testutil.allure2.AllureUtils.saveAsBrokenTest;
 import static java.lang.String.format;
@@ -11,7 +11,7 @@ import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 @CucumberOptions(
-    glue = {"com.github.ddemin.test.step"},
+    glue = {"com.github.ddemin.envrouter.demo.step"},
     features = {"src/test/resources/features"},
     plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm", "pretty"}
 )

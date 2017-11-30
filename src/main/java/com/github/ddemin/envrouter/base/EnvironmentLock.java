@@ -2,6 +2,7 @@ package com.github.ddemin.envrouter.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Created by Dmitrii Demin on 19.09.2017.
@@ -14,7 +15,7 @@ public class EnvironmentLock<T> {
   private T targetEntity;
   private LockStatus lockStatus;
 
-  public EnvironmentLock(LockStatus lockStatus) {
+  public EnvironmentLock(@NonNull LockStatus lockStatus) {
     this.lockStatus = lockStatus;
   }
 

@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,11 +16,11 @@ import lombok.extern.slf4j.Slf4j;
  * Created by Dmitrii Demin on 19.09.2017.
  */
 @Slf4j
-public class EntitiesQueues<T extends TestEntityWrapper> {
+public class TestEntitiesQueues<T extends TestEntityWrapper> {
 
   public static final String ANY_ENVIRONMENT = "any";
 
-  private Map<String, Queue<T>> entitysQueuesForEnvs = new HashMap<>();
+  private Map<String, Queue<T>> entitiesQueuesForEnvs = new HashMap<>();
 
   /**
    * See #add.
@@ -36,13 +38,13 @@ public class EntitiesQueues<T extends TestEntityWrapper> {
    */
   public void add(@NonNull T entity) {
     String requiredEnv = entity.getRequiredEnvironmentName();
-    if (entitysQueuesForEnvs.get(requiredEnv) == null) {
-      entitysQueuesForEnvs.put(
+    if (entitiesQueuesForEnvs.get(requiredEnv) == null) {
+      entitiesQueuesForEnvs.put(
           requiredEnv,
           new PriorityQueue<>(Comparator.comparingInt(T::getPriority))
       );
     }
-    entitysQueuesForEnvs.get(requiredEnv).add(entity);
+    entitiesQueuesForEnvs.get(requiredEnv).add(entity);
   }
 
   /**
@@ -79,7 +81,7 @@ public class EntitiesQueues<T extends TestEntityWrapper> {
   }
 
   public Map<String, Queue<T>> getQueuesMap() {
-    return entitysQueuesForEnvs;
+    return entitiesQueuesForEnvs;
   }
 
   /**
@@ -88,7 +90,7 @@ public class EntitiesQueues<T extends TestEntityWrapper> {
    * @return total count of found entity files
    */
   public int entitiesInAllQueues() {
-    return entitysQueuesForEnvs.values().stream()
+    return entitiesQueuesForEnvs.values().stream()
         .map(Queue::size)
         .reduce(0, Integer::sum);
   }
@@ -100,11 +102,31 @@ public class EntitiesQueues<T extends TestEntityWrapper> {
    * @return queue for environment
    */
   public Queue<T> getQueueFor(@NonNull String definedEnv) {
-    Entry<String, Queue<T>> entry = entitysQueuesForEnvs.entrySet().stream()
+    Entry<String, Queue<T>> entry = entitiesQueuesForEnvs.entrySet().stream()
         .filter(it -> definedEnv.startsWith(it.getKey()) && it.getValue().size() > 0)
         .findFirst()
         .orElse(null);
     return entry == null ? null : entry.getValue();
+  }
+
+  /**
+   * Get list of queues that have required environments that don't exist.
+   *
+   * @param definedEnvs set of environments that exist now
+   * @return list of queues for environments that don't exist (weren't provided)
+   */
+  public List<Entry<String, Queue<T>>> getQueuesForUndefinedEnvs(@NonNull Set<Environment> definedEnvs) {
+    log.debug("Get all queues for undefined environments...");
+    return this.getQueuesMap().entrySet().stream()
+        .filter(
+            entry ->
+                definedEnvs.stream().noneMatch(
+                    confEnv -> confEnv.getName().startsWith(entry.getKey())
+                )
+        )
+        .filter(entry -> !entry.getKey().equals(ANY_ENVIRONMENT))
+        .filter(entry -> entry.getValue().size() > 0)
+        .collect(Collectors.toList());
   }
 
 }
