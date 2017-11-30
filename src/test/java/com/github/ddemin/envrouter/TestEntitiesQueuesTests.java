@@ -3,13 +3,20 @@ package com.github.ddemin.envrouter;
 import static com.github.ddemin.envrouter.base.TestEntitiesQueues.ANY_ENVIRONMENT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 
+import com.github.ddemin.envrouter.base.Environment;
 import com.github.ddemin.envrouter.base.TestEntitiesQueues;
 import com.github.ddemin.envrouter.base.TestEntityWrapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Queue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -18,6 +25,7 @@ public class TestEntitiesQueuesTests {
 
   private static final String ENV1 = "test1";
   private static final String ENV2 = "test2";
+  private static final String ENV_UNK = "test2Unknown";
 
   private TestEntityWrapper<String> wrpEnv1P1;
   private TestEntityWrapper<String> wrpEnv1P2;
@@ -26,6 +34,7 @@ public class TestEntitiesQueuesTests {
   private TestEntityWrapper<String> wrpEnv2P2;
   private TestEntityWrapper<String> wrpEnvAnyP1;
   private TestEntityWrapper<String> wrpEnvAnyP2;
+  private TestEntityWrapper<String> wrpEnvUnk;
 
 
   @BeforeClass
@@ -37,6 +46,7 @@ public class TestEntitiesQueuesTests {
     wrpEnv2P2 = new TestEntityWrapper<>("demo", ENV2, 2);
     wrpEnvAnyP1 = new TestEntityWrapper<>("demo", ANY_ENVIRONMENT, 1);
     wrpEnvAnyP2 = new TestEntityWrapper<>("demo", ANY_ENVIRONMENT, 2);
+    wrpEnvUnk = new TestEntityWrapper<>("demo", ENV_UNK, 2);
   }
 
   @SuppressFBWarnings
@@ -44,6 +54,40 @@ public class TestEntitiesQueuesTests {
   public void catchNpeForAdding() {
     TestEntitiesQueues<TestEntityWrapper<String>> queues = new TestEntitiesQueues<>();
     queues.add(null);
+  }
+
+  @Test
+  public void getQueuesForUndefinedEnv() {
+    TestEntitiesQueues<TestEntityWrapper<String>> queues = new TestEntitiesQueues<>();
+    queues.add(wrpEnvUnk);
+    queues.add(wrpEnvAnyP1);
+    queues.add(wrpEnv2P1);
+    List<Entry<String, Queue<TestEntityWrapper<String>>>> queuesForUndefinedEnvs =  queues.getQueuesForUndefinedEnvs(
+        new HashSet<>(
+            Arrays.asList(
+                new Environment(Paths.get("src/test/resources/" + RouterConfig.ENVS_DIRECTORY + "/" + ENV2))
+            )
+        )
+    );
+    assertThat(queuesForUndefinedEnvs, hasSize(1));
+    assertThat(queuesForUndefinedEnvs.get(0).getKey(), equalTo(ENV_UNK));
+    assertThat(queuesForUndefinedEnvs.get(0).getValue().poll(), equalTo(wrpEnvUnk));
+
+    queuesForUndefinedEnvs =  queues.getQueuesForUndefinedEnvs(
+        new HashSet<>(
+            Arrays.asList(
+                new Environment(Paths.get("src/test/resources/" + RouterConfig.ENVS_DIRECTORY + "/" + ENV2))
+            )
+        )
+    );
+    assertThat(queuesForUndefinedEnvs, hasSize(0));
+  }
+
+  @SuppressFBWarnings
+  @Test(expectedExceptions = NullPointerException.class)
+  public void catchNpeForGettingForUndefEnv() {
+    TestEntitiesQueues<TestEntityWrapper> queues = new TestEntitiesQueues<>();
+    queues.getQueuesForUndefinedEnvs(null);
   }
 
   @SuppressFBWarnings
