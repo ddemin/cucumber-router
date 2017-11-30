@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.ddemin:test-automation-utils:0.1'
+    compile 'com.github.ddemin:test-automation-utils:0.1.1'
     compile 'io.cucumber:gherkin:5.0.0'
     compile 'io.cucumber:cucumber-core:2.1.0'
     compile 'org.hamcrest:hamcrest-core:1.3'
