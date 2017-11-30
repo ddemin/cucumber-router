@@ -72,7 +72,7 @@ public class RouterCucumberCli extends AbstractCucumberTest {
           throw new RuntimeException(
               format("Environment %s for feature %s isn't defined",
                   wrapper.getRequiredEnvironmentName(),
-                  wrapper.getFeature().getUri())
+                  wrapper.getEntity().getUri())
           );
         }
         EnvironmentsContext.setCurrent(envForTest);
@@ -97,7 +97,7 @@ public class RouterCucumberCli extends AbstractCucumberTest {
         throw new RuntimeException(
             format(
                 "Feature %s has undefined environment %s",
-                wrapper.getFeature().getUri(),
+                wrapper.getEntity().getUri(),
                 wrapper.getRequiredEnvironmentName()
             )
         );

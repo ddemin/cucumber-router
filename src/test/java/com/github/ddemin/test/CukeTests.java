@@ -34,11 +34,11 @@ public class CukeTests extends AbstractCucumberTest {
       case FAILURE_UNDEFINED_ENV:
         errorMessage = format(
             "Feature %s has undefined environment %s",
-            wrapper.getFeature().getUri(),
+            wrapper.getEntity().getUri(),
             wrapper.getRequiredEnvironmentName()
         );
         saveAsBrokenTest(
-            wrapper.getFeature().getUri(),
+            wrapper.getEntity().getUri(),
             errorMessage
         );
         throw new RuntimeException(errorMessage);

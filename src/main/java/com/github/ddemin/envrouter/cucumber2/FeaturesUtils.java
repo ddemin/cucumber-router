@@ -1,8 +1,9 @@
 package com.github.ddemin.envrouter.cucumber2;
 
-import static com.github.ddemin.envrouter.cucumber2.FeaturesQueues.ANY_ENVIRONMENT;
+import static com.github.ddemin.envrouter.base.EntitiesQueues.ANY_ENVIRONMENT;
 
 import com.github.ddemin.envrouter.RouterConfig;
+import com.github.ddemin.envrouter.base.EntitiesQueues;
 import com.github.ddemin.envrouter.base.Environment;
 import cucumber.runtime.model.CucumberFeature;
 import java.util.List;
@@ -66,7 +67,7 @@ public class FeaturesUtils {
    * @return list of queues for environments that don't exist (weren't provided)
    */
   public static List<Entry<String, Queue<FeatureWrapper>>> getQueuesForUndefinedEnvs(
-      @NonNull FeaturesQueues queuesGroup,
+      @NonNull EntitiesQueues<FeatureWrapper> queuesGroup,
       @NonNull Set<Environment> definedEnvs
   ) {
     log.debug("Get all queues for undefined environments...");

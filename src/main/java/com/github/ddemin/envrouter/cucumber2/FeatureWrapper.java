@@ -2,10 +2,9 @@ package com.github.ddemin.envrouter.cucumber2;
 
 import static java.lang.String.format;
 
+import com.github.ddemin.envrouter.base.TestEntityWrapper;
 import cucumber.runtime.model.CucumberFeature;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -13,22 +12,19 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Getter
 @Slf4j(topic = "wrapper")
-@AllArgsConstructor
-public class FeatureWrapper {
+public class FeatureWrapper extends TestEntityWrapper<CucumberFeature> {
 
-  @NonNull
-  private CucumberFeature feature;
-  @NonNull
-  private String requiredEnvironmentName;
-  private int priority;
+  public FeatureWrapper(CucumberFeature entity, String requiredEnvironmentName, int priority) {
+    super(entity, requiredEnvironmentName, priority);
+  }
 
   @Override
   public String toString() {
     return format(
         "%s (Env: %s, Priority: %d)",
-        feature.getUri(),
-        requiredEnvironmentName,
-        priority
+        getEntity().getUri(),
+        getRequiredEnvironmentName(),
+        getPriority()
     );
   }
 

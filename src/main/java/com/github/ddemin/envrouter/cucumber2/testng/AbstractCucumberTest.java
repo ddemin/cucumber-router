@@ -7,13 +7,13 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.Is.is;
 
 import com.github.ddemin.envrouter.RouterConfig;
+import com.github.ddemin.envrouter.base.EntitiesQueues;
 import com.github.ddemin.envrouter.base.Environment;
 import com.github.ddemin.envrouter.base.EnvironmentLock;
 import com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus;
 import com.github.ddemin.envrouter.base.EnvironmentLocksController;
 import com.github.ddemin.envrouter.base.EnvironmentsContext;
 import com.github.ddemin.envrouter.cucumber2.FeatureWrapper;
-import com.github.ddemin.envrouter.cucumber2.FeaturesQueues;
 import com.github.ddemin.envrouter.cucumber2.FeaturesUtils;
 import com.github.ddemin.testutil.io.FileSystemUtils;
 import cucumber.api.testng.CucumberFeatureWrapper;
@@ -55,8 +55,10 @@ public abstract class AbstractCucumberTest implements ITest {
       },
       RouterConfig.ENV_THREADS_MAX
   );
-  private static final Map<Class<? extends AbstractCucumberTest>, FeaturesQueues> FEATURES_QUEUES
-      = new HashMap<>();
+  private static final Map<
+      Class<? extends AbstractCucumberTest>,
+      EntitiesQueues<FeatureWrapper>
+      > FEATURES_QUEUES = new HashMap<>();
   private final ThreadLocal<TestNGCucumberRunner> cukeRunner
       = ThreadLocal.withInitial(() -> new TestNGCucumberRunner(this.getClass()));
   private final ThreadLocal<EnvironmentLock<FeatureWrapper>> envLock
@@ -70,7 +72,7 @@ public abstract class AbstractCucumberTest implements ITest {
       return "TestNG fixture";
     } else if (envLock.get().getTargetEntity() != null) {
       return envLock.get().getTargetEntity()
-          .getFeature().getGherkinFeature().getFeature().getName();
+          .getEntity().getGherkinFeature().getFeature().getName();
     } else {
       return "Undefined feature. Global error occurred";
     }
@@ -127,7 +129,7 @@ public abstract class AbstractCucumberTest implements ITest {
         try {
           EnvironmentsContext.setCurrent(env);
           cukeRunner.get().getFeatures();
-          cukeRunner.get().runCucumber(feature.getFeature());
+          cukeRunner.get().runCucumber(feature.getEntity());
         } finally {
           ENVS_CONTROLLER.release(env);
         }
@@ -141,7 +143,7 @@ public abstract class AbstractCucumberTest implements ITest {
   private EnvironmentLock<FeatureWrapper> lockEnvAndSelectFeature() {
     synchronized (AbstractCucumberTest.class) {
       try {
-        FeaturesQueues ensQueues = getEnvsQueuesForThisClass();
+        EntitiesQueues<FeatureWrapper> ensQueues = getEnvsQueuesForThisClass();
 
         List<Entry<String, Queue<FeatureWrapper>>> queuesForUndefinedEnvs
             = FeaturesUtils.getQueuesForUndefinedEnvs(ensQueues, ENVS_CONTROLLER.getAll());
@@ -149,7 +151,7 @@ public abstract class AbstractCucumberTest implements ITest {
         FeatureWrapper featureForTest = null;
         Environment envForTest = null;
 
-        if (ensQueues.featuresInAllQueues() <= 0) {
+        if (ensQueues.entitiesInAllQueues() <= 0) {
           log.error("No any features in queues");
           return new EnvironmentLock<>(LockStatus.FAILURE_NO_TARGET_ENTITIES);
         } else if (queuesForUndefinedEnvs.size() > 0) {
@@ -166,7 +168,7 @@ public abstract class AbstractCucumberTest implements ITest {
         } else {
           log.debug("Search untested features for available environments...");
           for (Environment env : availableEnvs) {
-            featureForTest = ensQueues.pollFeatureFor(env.getName());
+            featureForTest = ensQueues.pollEntityFor(env.getName());
             if (featureForTest != null) {
               envForTest = env;
               break;
@@ -193,7 +195,7 @@ public abstract class AbstractCucumberTest implements ITest {
   }
 
   private int initFeaturesQueues() {
-    FeaturesQueues ensQueues = getEnvsQueuesForThisClass();
+    EntitiesQueues<FeatureWrapper> ensQueues = getEnvsQueuesForThisClass();
     ensQueues.addAll(
         FeaturesUtils.wrapFeatures(
             Arrays.stream(cukeRunner.get().provideFeatures())
@@ -205,12 +207,12 @@ public abstract class AbstractCucumberTest implements ITest {
                 .collect(Collectors.toList())
         )
     );
-    log.info("Save all features to queues. Processed {}", ensQueues.featuresInAllQueues());
-    return ensQueues.featuresInAllQueues();
+    log.info("Save all features to queues. Processed {}", ensQueues.entitiesInAllQueues());
+    return ensQueues.entitiesInAllQueues();
   }
 
-  private FeaturesQueues getEnvsQueuesForThisClass() {
-    return FEATURES_QUEUES.computeIfAbsent(this.getClass(), clz -> new FeaturesQueues());
+  private EntitiesQueues<FeatureWrapper> getEnvsQueuesForThisClass() {
+    return FEATURES_QUEUES.computeIfAbsent(this.getClass(), clz -> new EntitiesQueues<>());
   }
 
 }
