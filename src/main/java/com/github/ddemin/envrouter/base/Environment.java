@@ -1,11 +1,9 @@
 package com.github.ddemin.envrouter.base;
 
-import com.github.ddemin.envrouter.RouterConfig;
-import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberTest;
 import com.github.ddemin.testutil.io.PropertiesUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Properties;
 import lombok.Data;
 import lombok.NonNull;
@@ -29,22 +27,10 @@ public class Environment {
     log.debug("Create environment based on folder: {}", pathToPropertiesDir);
     this.pathToPropertiesDir = pathToPropertiesDir;
     this.name = pathToPropertiesDir.getFileName().toString();
-    this.properties = new Properties(System.getProperties());
-    try {
-      this.properties.putAll(
-          PropertiesUtils.readProperties(
-              AbstractCucumberTest.class
-                  .getClassLoader()
-                  .getResource(RouterConfig.ENVS_DIRECTORY)
-                  .toURI()
-          )
-      );
-    } catch (URISyntaxException ex) {
-      throw new RuntimeException(ex);
-    }
-    this.properties.putAll(
-        PropertiesUtils.readProperties(pathToPropertiesDir.toUri())
-    );
+
+    this.properties = new Properties();
+    withProperties(System.getProperties());
+    withProperties(PropertiesUtils.readProperties(pathToPropertiesDir.toUri()));
   }
 
   @Override
@@ -53,9 +39,6 @@ public class Environment {
       return true;
     }
     if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
       return false;
     }
 
@@ -69,6 +52,10 @@ public class Environment {
     int result = super.hashCode();
     result = 31 * result + pathToPropertiesDir.hashCode();
     return result;
+  }
+
+  public void withProperties(Map map) {
+    this.properties.putAll(map);
   }
 
 }

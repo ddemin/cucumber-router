@@ -2,6 +2,7 @@ package com.github.ddemin.envrouter.base;
 
 import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberTest;
 import com.github.ddemin.testutil.io.FileSystemUtils;
+import com.github.ddemin.testutil.io.PropertiesUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -40,7 +41,22 @@ public class EnvironmentsUtils {
     }
 
     return FileSystemUtils.getSubdirectories(dirUri).stream()
-        .map(Environment::new)
+        .map(path -> {
+          Environment env = new Environment(path);
+          try {
+            env.withProperties(
+                PropertiesUtils.readProperties(
+                    AbstractCucumberTest.class
+                        .getClassLoader()
+                        .getResource(pathToDir)
+                        .toURI()
+                )
+            );
+          } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+          }
+          return env;
+        })
         .collect(Collectors.toSet());
   }
 

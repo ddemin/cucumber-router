@@ -4,7 +4,9 @@ import static java.lang.String.format;
 
 import com.github.ddemin.envrouter.base.TestEntityWrapper;
 import cucumber.runtime.model.CucumberFeature;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,7 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "wrapper")
 public class FeatureWrapper extends TestEntityWrapper<CucumberFeature> {
 
-  public FeatureWrapper(CucumberFeature entity, String requiredEnvironmentName, int priority) {
+  @SuppressFBWarnings
+  public FeatureWrapper(@NonNull CucumberFeature entity, String requiredEnvironmentName, int priority) {
     super(entity, requiredEnvironmentName, priority);
   }
 

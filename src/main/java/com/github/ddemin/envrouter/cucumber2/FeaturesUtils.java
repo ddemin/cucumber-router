@@ -1,8 +1,5 @@
 package com.github.ddemin.envrouter.cucumber2;
 
-import static com.github.ddemin.envrouter.base.TestEntitiesQueues.ANY_ENVIRONMENT;
-
-import com.github.ddemin.envrouter.RouterConfig;
 import cucumber.runtime.model.CucumberFeature;
 import java.util.List;
 import java.util.Optional;
@@ -62,9 +59,7 @@ public class FeaturesUtils {
   }
 
   private static String getFeatureRequiredEnvironment(@NonNull CucumberFeature feature) {
-    return extractTagEnding(feature, CUKE_ENV_TAG)
-        .orElse(RouterConfig.ENV_DEFAULT == null ? ANY_ENVIRONMENT : RouterConfig.ENV_DEFAULT)
-        .toLowerCase();
+    return extractTagEnding(feature, CUKE_ENV_TAG).orElse(null);
   }
 
   private static Optional<String> extractTagEnding(@NonNull CucumberFeature feature,

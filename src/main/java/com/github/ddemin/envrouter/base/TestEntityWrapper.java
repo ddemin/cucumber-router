@@ -2,7 +2,8 @@ package com.github.ddemin.envrouter.base;
 
 import static java.lang.String.format;
 
-import lombok.AllArgsConstructor;
+import com.github.ddemin.envrouter.RouterConfig;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -12,14 +13,26 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Getter
 @Slf4j(topic = "wrapper")
-@AllArgsConstructor
 public class TestEntityWrapper<T> {
 
-  @NonNull
+  public static final String ANY_ENV = "any";
+
   private T entity;
-  @NonNull
   private String requiredEnvironmentName;
   private int priority;
+
+  /**
+   * Creates wrapper for test entity.
+   * @param entity entity
+   * @param requiredEnvironmentName name of environment that required for this entity
+   * @param priority entity's priority. Lower - more chances to be tested first
+   */
+  @SuppressFBWarnings
+  public TestEntityWrapper(@NonNull T entity, String requiredEnvironmentName, int priority) {
+    this.entity = entity;
+    this.requiredEnvironmentName = requiredEnvironmentName == null ? chooseAnyOrDefaultEnv() : requiredEnvironmentName;
+    this.priority = priority;
+  }
 
   @Override
   public String toString() {
@@ -29,6 +42,10 @@ public class TestEntityWrapper<T> {
         getRequiredEnvironmentName(),
         getPriority()
     );
+  }
+
+  public String chooseAnyOrDefaultEnv() {
+    return RouterConfig.ENV_DEFAULT == null ? ANY_ENV : RouterConfig.ENV_DEFAULT;
   }
 
 }

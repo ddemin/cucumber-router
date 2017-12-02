@@ -27,5 +27,4 @@ public class EnvironmentLock<T> {
     FAILURE_UNDEFINED_ENV
   }
 
-
 }

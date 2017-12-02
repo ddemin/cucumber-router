@@ -1,6 +1,6 @@
 package com.github.ddemin.envrouter;
 
-import static com.github.ddemin.envrouter.base.TestEntitiesQueues.ANY_ENVIRONMENT;
+import static com.github.ddemin.envrouter.base.TestEntityWrapper.ANY_ENV;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
@@ -44,13 +44,13 @@ public class TestEntitiesQueuesTests {
     wrpEnv1P3 = new TestEntityWrapper<>("demo", ENV1, 3);
     wrpEnv2P1 = new TestEntityWrapper<>("demo", ENV2, 1);
     wrpEnv2P2 = new TestEntityWrapper<>("demo", ENV2, 2);
-    wrpEnvAnyP1 = new TestEntityWrapper<>("demo", ANY_ENVIRONMENT, 1);
-    wrpEnvAnyP2 = new TestEntityWrapper<>("demo", ANY_ENVIRONMENT, 2);
+    wrpEnvAnyP1 = new TestEntityWrapper<>("demo", ANY_ENV, 1);
+    wrpEnvAnyP2 = new TestEntityWrapper<>("demo", ANY_ENV, 2);
     wrpEnvUnk = new TestEntityWrapper<>("demo", ENV_UNK, 2);
   }
 
   @SuppressFBWarnings
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class, expectedExceptionsMessageRegExp = "entity")
   public void catchNpeForAdding() {
     TestEntitiesQueues<TestEntityWrapper<String>> queues = new TestEntitiesQueues<>();
     queues.add(null);
@@ -65,7 +65,7 @@ public class TestEntitiesQueuesTests {
     List<Entry<String, Queue<TestEntityWrapper<String>>>> queuesForUndefinedEnvs =  queues.getQueuesForUndefinedEnvs(
         new HashSet<>(
             Arrays.asList(
-                new Environment(Paths.get("src/test/resources/" + RouterConfig.ENVS_DIRECTORY + "/" + ENV2))
+                new Environment(Paths.get("src/test/resources", RouterConfig.ENVS_DIRECTORY, ENV2))
             )
         )
     );
@@ -76,7 +76,7 @@ public class TestEntitiesQueuesTests {
     queuesForUndefinedEnvs =  queues.getQueuesForUndefinedEnvs(
         new HashSet<>(
             Arrays.asList(
-                new Environment(Paths.get("src/test/resources/" + RouterConfig.ENVS_DIRECTORY + "/" + ENV2))
+                new Environment(Paths.get("src/test/resources", RouterConfig.ENVS_DIRECTORY, ENV2))
             )
         )
     );
@@ -84,28 +84,28 @@ public class TestEntitiesQueuesTests {
   }
 
   @SuppressFBWarnings
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class, expectedExceptionsMessageRegExp = "definedEnvs")
   public void catchNpeForGettingForUndefEnv() {
     TestEntitiesQueues<TestEntityWrapper> queues = new TestEntitiesQueues<>();
     queues.getQueuesForUndefinedEnvs(null);
   }
 
   @SuppressFBWarnings
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class, expectedExceptionsMessageRegExp = "entities")
   public void catchNpeForAddingAll() {
     TestEntitiesQueues<TestEntityWrapper> queues = new TestEntitiesQueues<>();
     queues.addAll(null);
   }
 
   @SuppressFBWarnings
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class, expectedExceptionsMessageRegExp = "definedEnv")
   public void catchNpeForGettingQueue() {
     TestEntitiesQueues queues = new TestEntitiesQueues();
     queues.getQueueFor(null);
   }
 
   @SuppressFBWarnings
-  @Test(expectedExceptions = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class, expectedExceptionsMessageRegExp = "envName")
   public void catchNpeForPollingFeature() {
     TestEntitiesQueues queues = new TestEntitiesQueues();
     queues.pollEntityFor(null);

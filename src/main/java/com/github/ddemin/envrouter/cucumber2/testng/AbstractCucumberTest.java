@@ -1,6 +1,5 @@
 package com.github.ddemin.envrouter.cucumber2.testng;
 
-import com.github.ddemin.envrouter.RouterConfig;
 import com.github.ddemin.envrouter.base.Environment;
 import com.github.ddemin.envrouter.base.EnvironmentLock;
 import com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus;
@@ -24,10 +23,7 @@ import org.testng.annotations.DataProvider;
 @Slf4j
 public abstract class AbstractCucumberTest implements ITest {
 
-  private static final EnvsLocksController<FeatureWrapper> CONTROLLER = new EnvsLocksController<>(
-      () -> EnvironmentsUtils.initAllFromDirectory(RouterConfig.ENVS_DIRECTORY),
-      RouterConfig.ENV_THREADS_MAX
-  );
+  private static final EnvsLocksController<FeatureWrapper> CONTROLLER = new EnvsLocksController<>();
   private static final Map<Class<? extends AbstractCucumberTest>, TestEntitiesQueues<FeatureWrapper>> QUEUES
       = new HashMap<>();
 
@@ -60,7 +56,7 @@ public abstract class AbstractCucumberTest implements ITest {
   @BeforeMethod(alwaysRun = true)
   public void lockEnvAndPrepareFeature() {
     log.info("Try to find untested feature and lock appropriate env...");
-    envLock.set(CONTROLLER.findUntestedEntityAndAssignEnv(getEnvsQueuesForThisClass()));
+    envLock.set(CONTROLLER.findUntestedEntityAndLockEnv(getEnvsQueuesForThisClass()));
   }
 
   /**

@@ -20,7 +20,7 @@ public class StepDefs {
 
     assertThat("This assert must be successful", 7, greaterThan(6));
 
-    allureStep(getProperties().getProperty("test.global"));
+    allureStep(getProperties().getProperty("common.property"));
     allureStep(getProperties().getProperty("test.step1"));
     sleep();
   }

@@ -3,9 +3,7 @@ package com.github.ddemin.envrouter.cucumber2;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
-import com.github.ddemin.envrouter.RouterConfig;
 import com.github.ddemin.envrouter.base.EnvironmentLock;
-import com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus;
 import com.github.ddemin.envrouter.base.EnvironmentsUtils;
 import com.github.ddemin.envrouter.base.EnvsLocksController;
 import com.github.ddemin.envrouter.base.TestEntitiesQueues;
@@ -47,24 +45,13 @@ public class RouterCucumberCli extends AbstractCucumberTest {
     Runtime runtime = new Runtime(resourceLoader, classFinder, classLoader, runtimeOptions) {
       @Override
       public void runFeature(CucumberFeature feature) {
-        EnvsLocksController<FeatureWrapper> controller = new EnvsLocksController<>(
-            () -> EnvironmentsUtils.initAllFromDirectory(RouterConfig.ENVS_DIRECTORY),
-            RouterConfig.ENV_THREADS_MAX
-        );
+        EnvsLocksController<FeatureWrapper> controller = new EnvsLocksController<>();
 
         TestEntitiesQueues<FeatureWrapper> queues = new TestEntitiesQueues<>();
         queues.add(FeaturesUtils.wrapFeature(feature));
 
-        EnvironmentLock<FeatureWrapper> lock = controller.findUntestedEntityAndAssignEnv(queues);
-        if (lock.getLockStatus() != LockStatus.SUCCESS_LOCKED) {
-          INSTANCE.processFailedLocking(lock);
-          throw new RuntimeException(
-              format("Environment %s can't be locked for feature %s: %s",
-                  lock.getTargetEntity().getRequiredEnvironmentName(),
-                  lock.getTargetEntity().getEntity().getUri(),
-                  lock.getLockStatus())
-          );
-        }
+        EnvironmentLock<FeatureWrapper> lock = controller.findUntestedEntityAndLockEnv(queues);
+        INSTANCE.processFailedLocking(lock);
 
         EnvironmentsUtils.setCurrent(lock.getEnvironment());
 

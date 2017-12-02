@@ -1,5 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'jacoco'
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.11'
+    id 'java'
+    id 'jacoco'
+}
 
 group theGroup
 version theVersion
@@ -14,6 +17,10 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url "https://jitpack.io" }
+    maven {
+        // TODO Remove after JaCoCo 0.7.10 release
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
 }
 
 dependencies {
@@ -29,7 +36,7 @@ dependencies {
     compile 'io.cucumber:cucumber-testng:2.1.0'
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'org.awaitility:awaitility:2.0.0'
-    compileClasspath 'org.projectlombok:lombok:1.16.12'
+    compileClasspath 'org.projectlombok:lombok:1.16.18'
     compileClasspath 'com.google.code.findbugs:findbugs:3.0.1'
 
     testCompile 'io.cucumber:cucumber-java:2.1.0'
@@ -37,7 +44,7 @@ dependencies {
     testCompile 'ch.qos.logback:logback-classic:1.1.8'
     testCompile 'ch.qos.logback:logback-core:1.1.8'
     testCompile 'org.mockito:mockito-all:1.10.19'
-    testCompileClasspath 'org.projectlombok:lombok:1.16.12'
+    testCompileClasspath 'org.projectlombok:lombok:1.16.18'
     testCompileClasspath 'com.google.code.findbugs:findbugs:3.0.1'
 }
 
@@ -51,7 +58,8 @@ test {
         setUseDefaultListeners(true)
         setParallel("classes")
         includeGroups("unit")
-        setThreadCount(4)
+        // TODO Restriction for tests that change RouterConfig constants
+        setThreadCount(1)
     }
 }
 
@@ -63,6 +71,10 @@ task demo(type: Test) {
         includeGroups("demo")
         setThreadCount(3)
     }
+}
+
+jacoco {
+    toolVersion = "0.7.10-SNAPSHOT"
 }
 
 jacocoTestReport {
@@ -77,19 +89,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.3
-            }
-        }
-
-        rule {
-            enabled = false
-            element = 'CLASS'
-            includes = ['org.gradle.*']
-
-            limit {
-                counter = 'LINE'
-                value = 'TOTALCOUNT'
-                maximum = 0.3
+                minimum = 0.4
             }
         }
     }

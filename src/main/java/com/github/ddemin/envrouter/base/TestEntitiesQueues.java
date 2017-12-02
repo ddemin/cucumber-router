@@ -1,5 +1,7 @@
 package com.github.ddemin.envrouter.base;
 
+import static com.github.ddemin.envrouter.base.TestEntityWrapper.ANY_ENV;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -18,17 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TestEntitiesQueues<T extends TestEntityWrapper> {
 
-  public static final String ANY_ENVIRONMENT = "any";
-
   private Map<String, Queue<T>> entitiesQueuesForEnvs = new HashMap<>();
 
   /**
    * See #add.
    *
-   * @param entitys wrapped entitys
+   * @param entities wrapped entitys
    */
-  public void addAll(@NonNull List<T> entitys) {
-    entitys.forEach(this::add);
+  public void addAll(@NonNull List<T> entities) {
+    entities.forEach(this::add);
   }
 
   /**
@@ -58,7 +58,7 @@ public class TestEntitiesQueues<T extends TestEntityWrapper> {
 
     T chosenEntity;
     Queue<T> queueForEnv = getQueueFor(envName);
-    Queue<T> queueForAnyEnv = getQueueFor(ANY_ENVIRONMENT);
+    Queue<T> queueForAnyEnv = getQueueFor(ANY_ENV);
 
     if (queueForEnv == null && queueForAnyEnv == null) {
       log.warn("No entity found for env-s: ANY & {}", envName);
@@ -124,7 +124,7 @@ public class TestEntitiesQueues<T extends TestEntityWrapper> {
                     confEnv -> confEnv.getName().startsWith(entry.getKey())
                 )
         )
-        .filter(entry -> !entry.getKey().equals(ANY_ENVIRONMENT))
+        .filter(entry -> !entry.getKey().equals(ANY_ENV))
         .filter(entry -> entry.getValue().size() > 0)
         .collect(Collectors.toList());
   }
