@@ -14,12 +14,13 @@ import static org.hamcrest.core.Is.is;
 import com.github.ddemin.envrouter.RouterConfig;
 import com.github.ddemin.envrouter.RouterConfig.RouterConfigKeys;
 import com.google.common.collect.Maps;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -43,7 +44,8 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    */
   public EnvsLocksController() {
     log.debug("Create lock controller...");
-    this.testDatasLockMap = new ConcurrentHashMap<>(
+    this.testDatasLockMap = new TreeMap<>((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+    this.testDatasLockMap.putAll(
         Maps.asMap(
             EnvironmentsUtils.initAllFromDirectory(RouterConfig.ENVS_DIRECTORY),
             e -> RouterConfig.ENV_THREADS_MAX
@@ -112,7 +114,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
     return testDatasLockMap.entrySet().stream()
         .map(Entry::getKey)
         .filter(this::isAvailable)
-        .collect(Collectors.toSet());
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   /**
@@ -146,11 +148,30 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
   }
 
   /**
+   * Reset locking of environment.
+   *
+   * @param env environment for reset
+   */
+  @Synchronized
+  public void resetLock(@NonNull Environment env) {
+    log.debug("Reset locking of environment: {}", env);
+    testDatasLockMap.put(env, RouterConfig.ENV_THREADS_MAX);
+  }
+
+  /**
    * Release all environments.
    */
   @Synchronized
   public void releaseAll() {
     testDatasLockMap.keySet().forEach(this::release);
+  }
+
+  /**
+   * Reset locking of all environments.
+   */
+  @Synchronized
+  public void resetLockingOfAll() {
+    testDatasLockMap.keySet().forEach(this::resetLock);
   }
 
   /**
@@ -161,7 +182,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
   public @NonNull EnvironmentLock<T> findUntestedEntityAndLockEnv(@NonNull TestEntitiesQueues<T> envQueues) {
     return await()
         .timeout(RouterConfig.LOCK_TIMEOUT_MS, TimeUnit.MILLISECONDS)
-        .pollInterval(1, TimeUnit.SECONDS)
+        .pollInterval(500, TimeUnit.MILLISECONDS)
         .until(
             () -> findEntityAndLockEnv(envQueues),
             hasProperty(
@@ -212,7 +233,6 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
       );
       return new EnvironmentLock<>(envForTest, entityForTest, SUCCESS_LOCKED);
     } else {
-      log.error("Something goes wrong");
       return new EnvironmentLock<>(FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS);
     }
   }

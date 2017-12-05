@@ -23,6 +23,7 @@ public class TestEntityWrapper<T> {
 
   /**
    * Creates wrapper for test entity.
+   *
    * @param entity entity
    * @param requiredEnvironmentName name of environment that required for this entity
    * @param priority entity's priority. Lower - more chances to be tested first
@@ -30,7 +31,13 @@ public class TestEntityWrapper<T> {
   @SuppressFBWarnings
   public TestEntityWrapper(@NonNull T entity, String requiredEnvironmentName, int priority) {
     this.entity = entity;
-    this.requiredEnvironmentName = requiredEnvironmentName == null ? chooseAnyOrDefaultEnv() : requiredEnvironmentName;
+
+    if (RouterConfig.ENV_FORCED != null) {
+      this.requiredEnvironmentName = RouterConfig.ENV_FORCED;
+    } else {
+      this.requiredEnvironmentName
+          = requiredEnvironmentName == null ? chooseAnyOrDefaultEnv() : requiredEnvironmentName;
+    }
     this.priority = priority;
   }
 
@@ -44,7 +51,7 @@ public class TestEntityWrapper<T> {
     );
   }
 
-  public String chooseAnyOrDefaultEnv() {
+  private String chooseAnyOrDefaultEnv() {
     return RouterConfig.ENV_DEFAULT == null ? ANY_ENV : RouterConfig.ENV_DEFAULT;
   }
 

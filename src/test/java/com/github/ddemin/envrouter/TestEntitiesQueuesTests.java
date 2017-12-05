@@ -21,7 +21,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @Test(groups = "unit")
-public class TestEntitiesQueuesTests {
+public class TestEntitiesQueuesTests extends UnitTestsBase {
 
   private static final String ENV1 = "test1";
   private static final String ENV2 = "test2";
@@ -35,7 +35,6 @@ public class TestEntitiesQueuesTests {
   private TestEntityWrapper<String> wrpEnvAnyP1;
   private TestEntityWrapper<String> wrpEnvAnyP2;
   private TestEntityWrapper<String> wrpEnvUnk;
-
 
   @BeforeClass
   public void setUp() {
@@ -73,7 +72,7 @@ public class TestEntitiesQueuesTests {
     assertThat(queuesForUndefinedEnvs.get(0).getKey(), equalTo(ENV_UNK));
     assertThat(queuesForUndefinedEnvs.get(0).getValue().poll(), equalTo(wrpEnvUnk));
 
-    queuesForUndefinedEnvs =  queues.getQueuesForUndefinedEnvs(
+    queuesForUndefinedEnvs = queues.getQueuesForUndefinedEnvs(
         new HashSet<>(
             Arrays.asList(
                 new Environment(Paths.get("src/test/resources", RouterConfig.ENVS_DIRECTORY, ENV2))
@@ -131,6 +130,7 @@ public class TestEntitiesQueuesTests {
     queues.add(wrpEnv1P1);
     queues.add(wrpEnv2P1);
     assertThat(queues.entitiesInAllQueues(), equalTo(2));
+
     queues.getQueueFor(ENV1).poll();
     assertThat(queues.entitiesInAllQueues(), equalTo(1));
   }
@@ -157,7 +157,7 @@ public class TestEntitiesQueuesTests {
 
   @Test(dependsOnMethods = {"checkAddingByOneAndRecoilByEnv"})
   public void checkFeaturePollingForUnknownEnv() {
-    TestEntitiesQueues queues = new TestEntitiesQueues();
+    TestEntitiesQueues<TestEntityWrapper> queues = new TestEntitiesQueues<>();
     queues.add(wrpEnv1P1);
     assertThat(queues.pollEntityFor("Unknown env"), nullValue());
   }

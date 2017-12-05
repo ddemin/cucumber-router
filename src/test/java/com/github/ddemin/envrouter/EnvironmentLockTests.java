@@ -9,7 +9,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.testng.annotations.Test;
 
 @Test(groups = "unit")
-public class EnvironmentLockTests {
+public class EnvironmentLockTests extends UnitTestsBase {
 
   @SuppressFBWarnings
   @Test(expectedExceptions = NullPointerException.class, expectedExceptionsMessageRegExp = "lockStatus")

@@ -12,7 +12,7 @@ import java.util.Properties;
 import org.testng.annotations.Test;
 
 @Test(groups = "unit")
-public class EnvironmentTests {
+public class EnvironmentTests extends UnitTestsBase {
 
   private static final String ENV1 = "test1";
   private static final String ENV2 = "test2";
