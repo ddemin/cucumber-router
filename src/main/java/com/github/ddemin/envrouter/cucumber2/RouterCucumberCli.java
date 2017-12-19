@@ -7,7 +7,8 @@ import com.github.ddemin.envrouter.base.EnvironmentLock;
 import com.github.ddemin.envrouter.base.EnvironmentsUtils;
 import com.github.ddemin.envrouter.base.EnvsLocksController;
 import com.github.ddemin.envrouter.base.TestEntitiesQueues;
-import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberTest;
+import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberFeatureTest;
+import cucumber.api.Scenario;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.RuntimeOptions;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RouterCucumberCli extends AbstractCucumberTest {
+public class RouterCucumberCli extends AbstractCucumberFeatureTest {
 
   public static final RouterCucumberCli INSTANCE = new RouterCucumberCli();
 

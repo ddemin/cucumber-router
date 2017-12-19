@@ -51,14 +51,14 @@ public class FeaturesUtils {
         .collect(Collectors.toList());
   }
 
-  private static int getFeaturePriority(@NonNull CucumberFeature feature) {
+  static int getFeaturePriority(@NonNull CucumberFeature feature) {
     return extractTagEnding(feature, CUKE_PRIORITY_TAG)
         .filter(priorityStr -> priorityStr.matches("[\\d]+"))
         .map(Integer::parseInt)
         .orElse(Integer.MAX_VALUE);
   }
 
-  private static String getFeatureRequiredEnvironment(@NonNull CucumberFeature feature) {
+  static String getFeatureRequiredEnvironment(@NonNull CucumberFeature feature) {
     return extractTagEnding(feature, CUKE_ENV_TAG).orElse(null);
   }
 

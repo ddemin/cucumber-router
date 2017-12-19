@@ -1,6 +1,6 @@
 package com.github.ddemin.envrouter.base;
 
-import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberTest;
+import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberFeatureTest;
 import com.github.ddemin.testutil.io.FileSystemUtils;
 import com.github.ddemin.testutil.io.PropertiesUtils;
 import java.net.URI;
@@ -28,7 +28,7 @@ public class EnvironmentsUtils {
   public static Set<Environment> initAllFromDirectory(String pathToDir) {
     log.debug("Find environments directories in {}", pathToDir);
 
-    URL dirUrl = AbstractCucumberTest.class.getClassLoader().getResource(pathToDir);
+    URL dirUrl = AbstractCucumberFeatureTest.class.getClassLoader().getResource(pathToDir);
     if (dirUrl == null) {
       throw new IllegalArgumentException("Directory isn't found: " + pathToDir);
     }
@@ -46,7 +46,7 @@ public class EnvironmentsUtils {
           try {
             env.withProperties(
                 PropertiesUtils.readProperties(
-                    AbstractCucumberTest.class
+                    AbstractCucumberFeatureTest.class
                         .getClassLoader()
                         .getResource(pathToDir)
                         .toURI()

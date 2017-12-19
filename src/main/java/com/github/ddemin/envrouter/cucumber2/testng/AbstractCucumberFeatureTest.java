@@ -21,10 +21,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 
 @Slf4j
-public abstract class AbstractCucumberTest implements ITest {
+public abstract class AbstractCucumberFeatureTest implements ITest {
 
   private static final EnvsLocksController<FeatureWrapper> CONTROLLER = new EnvsLocksController<>();
-  private static final Map<Class<? extends AbstractCucumberTest>, TestEntitiesQueues<FeatureWrapper>> QUEUES
+  private static final Map<Class<? extends AbstractCucumberFeatureTest>, TestEntitiesQueues<FeatureWrapper>> QUEUES
       = new HashMap<>();
 
   private final ThreadLocal<EnvironmentLock<FeatureWrapper>> envLock = ThreadLocal.withInitial(() -> null);

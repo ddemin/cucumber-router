@@ -5,7 +5,7 @@ import static java.lang.String.format;
 
 import com.github.ddemin.envrouter.base.EnvironmentLock;
 import com.github.ddemin.envrouter.cucumber2.FeatureWrapper;
-import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberTest;
+import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberFeatureTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
     features = {"src/test/resources/features"},
     plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm", "pretty"}
 )
-public class CukeTests extends AbstractCucumberTest {
+public class CukeTests extends AbstractCucumberFeatureTest {
 
   @Factory(dataProvider = "routerDataProvider")
   public CukeTests() {
