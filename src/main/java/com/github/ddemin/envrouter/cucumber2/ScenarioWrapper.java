@@ -3,8 +3,6 @@ package com.github.ddemin.envrouter.cucumber2;
 import static java.lang.String.format;
 
 import com.github.ddemin.envrouter.base.TestEntityWrapper;
-import cucumber.api.Scenario;
-import cucumber.runtime.model.CucumberFeature;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import gherkin.events.PickleEvent;
 import lombok.Getter;

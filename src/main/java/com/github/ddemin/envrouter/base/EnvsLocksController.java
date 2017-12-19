@@ -38,9 +38,8 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
   private final Map<Environment, Integer> testDatasLockMap;
 
   /**
-   * Creates controller that handle availability of environments for usage in demo threads.
-   * ENVS_DIRECTORY and ENV_THREADS_MAX from RouterConfig will be used.
-   *
+   * Creates controller that handle availability of environments for usage in demo threads. ENVS_DIRECTORY and
+   * ENV_THREADS_MAX from RouterConfig will be used.
    */
   public EnvsLocksController() {
     log.debug("Create lock controller...");
@@ -176,6 +175,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
 
   /**
    * Find untested entity and try to lock appropriate environment for it.
+   *
    * @param envQueues queues with untested entities
    * @return environment-for-entity lock with some status
    */

@@ -61,7 +61,7 @@ public class TestEntitiesQueuesTests extends UnitTestsBase {
     queues.add(wrpEnvUnk);
     queues.add(wrpEnvAnyP1);
     queues.add(wrpEnv2P1);
-    List<Entry<String, Queue<TestEntityWrapper<String>>>> queuesForUndefinedEnvs =  queues.getQueuesForUndefinedEnvs(
+    List<Entry<String, Queue<TestEntityWrapper<String>>>> queuesForUndefinedEnvs = queues.getQueuesForUndefinedEnvs(
         new HashSet<>(
             Arrays.asList(
                 new Environment(Paths.get("src/test/resources", RouterConfig.ENVS_DIRECTORY, ENV2))
@@ -69,7 +69,7 @@ public class TestEntitiesQueuesTests extends UnitTestsBase {
         )
     );
     assertThat(queuesForUndefinedEnvs, hasSize(1));
-    assertThat(queuesForUndefinedEnvs.get(0).getKey(), equalTo(ENV_UNK));
+    assertThat(queuesForUndefinedEnvs.get(0).getKey(), equalTo(ENV_UNK.toLowerCase()));
     assertThat(queuesForUndefinedEnvs.get(0).getValue().poll(), equalTo(wrpEnvUnk));
 
     queuesForUndefinedEnvs = queues.getQueuesForUndefinedEnvs(

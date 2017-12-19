@@ -8,7 +8,6 @@ import com.github.ddemin.envrouter.base.EnvironmentsUtils;
 import com.github.ddemin.envrouter.base.EnvsLocksController;
 import com.github.ddemin.envrouter.base.TestEntitiesQueues;
 import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberFeatureTest;
-import cucumber.api.Scenario;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.RuntimeOptions;

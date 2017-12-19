@@ -33,10 +33,11 @@ public class TestEntityWrapper<T> {
     this.entity = entity;
 
     if (RouterConfig.ENV_FORCED != null) {
-      this.requiredEnvironmentName = RouterConfig.ENV_FORCED;
+      this.requiredEnvironmentName = RouterConfig.ENV_FORCED.toLowerCase();
     } else {
-      this.requiredEnvironmentName
-          = requiredEnvironmentName == null ? chooseAnyOrDefaultEnv() : requiredEnvironmentName;
+      this.requiredEnvironmentName = requiredEnvironmentName == null
+          ? chooseAnyOrDefaultEnv().toLowerCase()
+          : requiredEnvironmentName.toLowerCase();
     }
     this.priority = priority;
   }

@@ -15,13 +15,13 @@ import org.testng.annotations.Test;
     features = {"src/test/resources/features"},
     plugin = {"io.qameta.allure.cucumber2jvm.AllureCucumber2Jvm", "pretty"}
 )
-public class CukeTests extends AbstractCucumberFeatureTest {
+public class CukeFeatureBasedTests extends AbstractCucumberFeatureTest {
 
   @Factory(dataProvider = "routerDataProvider")
-  public CukeTests() {
+  public CukeFeatureBasedTests() {
   }
 
-  @Test(enabled = true, groups = "demo")
+  @Test(enabled = true, groups = "demoViaFeatures")
   public void runTest() {
     super.runNextFeature();
   }

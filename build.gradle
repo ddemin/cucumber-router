@@ -63,12 +63,22 @@ test {
     }
 }
 
-task demo(type: Test) {
+task demoViaFeatures(type: Test) {
     systemProperties System.getProperties()
     useTestNG() {
         setUseDefaultListeners(false)
         setParallel("instances")
-        includeGroups("demo")
+        includeGroups("demoViaFeatures")
+        setThreadCount(3)
+    }
+}
+
+task demoViaScenarios(type: Test) {
+    systemProperties System.getProperties()
+    useTestNG() {
+        setUseDefaultListeners(false)
+        setParallel("instances")
+        includeGroups("demoViaScenarios")
         setThreadCount(3)
     }
 }

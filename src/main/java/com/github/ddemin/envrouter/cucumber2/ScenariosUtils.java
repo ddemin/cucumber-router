@@ -73,7 +73,7 @@ public class ScenariosUtils {
     return scenario.pickle.getTags().stream()
         .filter(tag -> tag.getName().startsWith(str))
         .map(tag -> StringUtils.substringAfterLast(tag.getName(), str))
-        .findFirst();
+        .reduce((first, second) -> second);
   }
 
 }

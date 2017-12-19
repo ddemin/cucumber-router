@@ -26,8 +26,7 @@ public class Environment {
   public Environment(@NonNull Path pathToPropertiesDir) {
     log.debug("Create environment based on folder: {}", pathToPropertiesDir);
     this.pathToPropertiesDir = pathToPropertiesDir;
-    this.name = pathToPropertiesDir.getFileName().toString();
-
+    this.name = pathToPropertiesDir.getFileName().toString().toLowerCase();
     this.properties = new Properties();
     withProperties(System.getProperties());
     withProperties(PropertiesUtils.readProperties(pathToPropertiesDir.toUri()));

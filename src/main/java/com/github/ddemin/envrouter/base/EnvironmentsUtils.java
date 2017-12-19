@@ -22,6 +22,7 @@ public class EnvironmentsUtils {
 
   /**
    * Create Environments after scanning of directory with subdir-s.
+   *
    * @param pathToDir path to directory with subdir-s
    * @return environment objects that based on subdir-s in provided directory
    */
