@@ -23,7 +23,7 @@ public class CukeScenarioBasedTests extends AbstractCucumberScenarioTest {
 
   @Test(enabled = true, groups = "demoViaScenarios")
   public void runTest() {
-    super.runNextScenario();
+    super.runNextCukeEntity();
   }
 
   @Override

@@ -31,4 +31,14 @@ public class FeatureWrapper extends TestEntityWrapper<CucumberFeature> {
     );
   }
 
+  @Override
+  public String getName() {
+    return getEntity().getGherkinFeature().getFeature().getName();
+  }
+
+  @Override
+  public String getPath() {
+    return getEntity().getUri();
+  }
+
 }

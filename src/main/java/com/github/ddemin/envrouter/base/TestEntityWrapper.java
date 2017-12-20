@@ -21,6 +21,14 @@ public class TestEntityWrapper<T> {
   private String requiredEnvironmentName;
   private int priority;
 
+  public String getName() {
+    return "";
+  }
+
+  public String getPath() {
+    return "";
+  }
+
   /**
    * Creates wrapper for test entity.
    *

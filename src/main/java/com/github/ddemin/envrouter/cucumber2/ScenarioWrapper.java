@@ -31,4 +31,14 @@ public class ScenarioWrapper extends TestEntityWrapper<PickleEvent> {
     );
   }
 
+  @Override
+  public String getName() {
+    return getEntity().pickle.getName();
+  }
+
+  @Override
+  public String getPath() {
+    return getEntity().uri;
+  }
+
 }
