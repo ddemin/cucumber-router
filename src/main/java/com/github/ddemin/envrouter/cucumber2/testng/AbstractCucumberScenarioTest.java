@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 
 import com.github.ddemin.envrouter.base.EnvironmentLock;
-import com.github.ddemin.envrouter.base.TestEntitiesQueues;
 import com.github.ddemin.envrouter.cucumber2.ScenarioWrapper;
 import com.github.ddemin.envrouter.cucumber2.ScenariosUtils;
 import cucumber.api.testng.CucumberFeatureWrapper;
@@ -24,8 +23,8 @@ public abstract class AbstractCucumberScenarioTest extends AbstractCucumberTest<
   protected abstract void processFailedLocking(EnvironmentLock<ScenarioWrapper> lock);
 
   @Override
-  int initQueues() {
-    Map<CucumberFeature, List<PickleEvent>> scenariosMap = Arrays.stream(cukeRunner.get().provideScenarios())
+  List<ScenarioWrapper> wrapEntities() {
+    Map<CucumberFeature, List<PickleEvent>> scenariosMap = Arrays.stream(tlCukeRunner.get().provideScenarios())
         .map(objs ->
             new Pair<>(
                 ((CucumberFeatureWrapper) objs[1]).getCucumberFeature(),
@@ -38,16 +37,13 @@ public abstract class AbstractCucumberScenarioTest extends AbstractCucumberTest<
                 mapping(Pair::getValue, toList())
             )
         );
-    TestEntitiesQueues<ScenarioWrapper> envQueues = getEnvsQueuesForThisClass();
-    envQueues.addAll(ScenariosUtils.wrapScenarios(scenariosMap));
-    log.info("Save all scenarios to queues. Processed {}", envQueues.entitiesInAllQueues());
-    return envQueues.entitiesInAllQueues();
+    return ScenariosUtils.wrapScenarios(scenariosMap);
   }
 
   @Override
   void runCucumberEntity(ScenarioWrapper cucumberEntityWrapper) {
     try {
-      cukeRunner.get().runScenario(cucumberEntityWrapper.getEntity());
+      tlCukeRunner.get().runScenario(cucumberEntityWrapper.getEntity());
     } catch (Throwable throwable) {
       throw new RuntimeException(throwable);
     }

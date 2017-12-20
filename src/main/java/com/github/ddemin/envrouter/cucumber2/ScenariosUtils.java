@@ -27,6 +27,7 @@ public class ScenariosUtils {
    * Wrap cucumber-jvm feature and parse its priority tag and required environment tag.
    *
    * @param scenario cucumber-jvm scenario (PickleEvent)
+   * @param feature cucumber-jvm feature
    * @return list of wrapped features
    */
   public static ScenarioWrapper wrapScenario(@NonNull PickleEvent scenario, CucumberFeature feature) {
