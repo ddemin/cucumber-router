@@ -41,12 +41,8 @@ public abstract class AbstractCucumberScenarioTest extends AbstractCucumberTest<
   }
 
   @Override
-  void runCucumberEntity(ScenarioWrapper cucumberEntityWrapper) {
-    try {
+  void runCucumberEntity(ScenarioWrapper cucumberEntityWrapper) throws Throwable {
       tlCukeRunner.get().runScenario(cucumberEntityWrapper.getEntity());
-    } catch (Throwable throwable) {
-      throw new RuntimeException(throwable);
-    }
   }
 
 }

@@ -38,7 +38,7 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
 
   abstract List<T> wrapEntities();
 
-  abstract void runCucumberEntity(T cucumberEntityWrapper);
+  abstract void runCucumberEntity(T cucumberEntityWrapper) throws Throwable;
 
   {
     log.info("Transfer tags from property to cucumber runtime options...");
@@ -91,7 +91,7 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
     }
   }
 
-  protected void runNextCukeEntity() {
+  protected void runNextCukeEntity() throws Throwable {
     log.debug("Try to run feature demo. Lock info: {}", tlEnvLock.get());
     Environment env = tlEnvLock.get().getEnvironment();
     LockStatus lockStatus = tlEnvLock.get().getLockStatus();

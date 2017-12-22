@@ -22,7 +22,7 @@ public class CukeScenarioBasedTests extends AbstractCucumberScenarioTest {
   }
 
   @Test(enabled = true, groups = "demoViaScenarios")
-  public void runTest() {
+  public void runTest() throws Throwable {
     super.runNextCukeEntity();
   }
 
