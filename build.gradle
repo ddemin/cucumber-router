@@ -35,7 +35,7 @@ dependencies {
     compile 'io.cucumber:cucumber-core:2.2.0'
     compile 'io.cucumber:cucumber-testng:2.2.0'
     compile 'org.apache.commons:commons-lang3:3.5'
-    compile 'org.awaitility:awaitility:2.0.0'
+    compile 'org.awaitility:awaitility:3.0.0'
     compileClasspath 'org.projectlombok:lombok:1.16.18'
     compileClasspath 'com.google.code.findbugs:findbugs:3.0.1'
 

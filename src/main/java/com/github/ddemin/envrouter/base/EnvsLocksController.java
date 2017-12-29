@@ -181,6 +181,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    */
   public @NonNull EnvironmentLock<T> findUntestedEntityAndLockEnv(@NonNull TestEntitiesQueues<T> envQueues) {
     return await()
+        .pollInSameThread()
         .timeout(RouterConfig.LOCK_TIMEOUT_MS, TimeUnit.MILLISECONDS)
         .pollInterval(500, TimeUnit.MILLISECONDS)
         .until(

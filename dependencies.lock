@@ -40,8 +40,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -98,8 +98,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -152,8 +152,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -232,8 +232,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -286,8 +286,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -356,8 +356,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -434,8 +434,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -508,8 +508,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
@@ -582,8 +582,8 @@
             "requested": "3.5"
         },
         "org.awaitility:awaitility": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
+            "locked": "3.0.0",
+            "requested": "3.0.0"
         },
         "org.hamcrest:hamcrest-core": {
             "locked": "1.3",
