@@ -23,7 +23,7 @@ public class CukeFeatureBasedTests extends AbstractCucumberFeatureTest {
 
   @Test(enabled = true, groups = "demoViaFeatures")
   public void runTest() throws Throwable {
-    super.runNextCukeEntity();
+    super.testCucumberEntity();
   }
 
   @Override

@@ -6,8 +6,24 @@
     </encoder>
   </appender>
 
+  <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator>
+      <key>mdc</key>
+      <defaultValue>common</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="FILE-${mdc}" class="ch.qos.logback.core.FileAppender">
+        <file>build/log/${mdc}.log</file>
+        <encoder>
+          <pattern>%d{HH:mm:ss.SSS} [%-16thread] %-5level %+16logger{36} - %msg%n</pattern>
+        </encoder>
+      </appender>
+    </sift>
+  </appender>
+
   <root level="DEBUG">
     <appender-ref ref="STDOUT"/>
+    <appender-ref ref="SIFT"/>
   </root>
 
 </configuration>

@@ -57,4 +57,12 @@ public class Environment {
     this.properties.putAll(map);
   }
 
+  @Override
+  public String toString() {
+    return "Environment{"
+        + "name='" + name + '\''
+        + ", pathToPropertiesDir="
+        + pathToPropertiesDir
+        + '}';
+  }
 }

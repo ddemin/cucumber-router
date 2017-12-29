@@ -17,9 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.testng.ITest;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 
 @Slf4j
@@ -29,10 +30,12 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
   private static final EnvsLocksController<TestEntityWrapper> CONTROLLER = new EnvsLocksController<>();
   private static final Map<Class<? extends AbstractCucumberTest>, TestEntitiesQueues<? extends TestEntityWrapper>>
       QUEUES = new HashMap<>();
+  private static final String LOGBACK_MDC_KEY = "mdc";
 
   final ThreadLocal<TestNGCucumberRunner> tlCukeRunner
       = ThreadLocal.withInitial(() -> new TestNGCucumberRunner(this.getClass()));
   private final ThreadLocal<EnvironmentLock<T>> tlEnvLock = ThreadLocal.withInitial(() -> null);
+  private boolean annotationIsUpdated = false;
 
   protected abstract void processFailedLocking(EnvironmentLock<T> lock);
 
@@ -41,14 +44,17 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
   abstract void runCucumberEntity(T cucumberEntityWrapper) throws Throwable;
 
   {
-    log.info("Transfer tags from property to cucumber runtime options...");
-    List<String> tagGroups;
-    if (CukeConfig.TAGS != null) {
-      tagGroups = Splitter.on(';').splitToList(CukeConfig.TAGS);
-      log.info("Tags: " + tagGroups);
+    if (!annotationIsUpdated) {
+      log.debug("Transfer tags from property to cucumber runtime options...");
+      List<String> tagGroups;
+      if (CukeConfig.TAGS != null) {
+        tagGroups = Splitter.on(';').splitToList(CukeConfig.TAGS);
+        log.info("Tags: " + tagGroups);
 
-      CucumberOptions cucumberOptions = getClass().getAnnotation(CucumberOptions.class);
-      changeAnnotationValue(cucumberOptions, "tags", tagGroups.toArray(new String[tagGroups.size()]));
+        CucumberOptions cucumberOptions = getClass().getAnnotation(CucumberOptions.class);
+        changeAnnotationValue(cucumberOptions, "tags", tagGroups.toArray(new String[tagGroups.size()]));
+        annotationIsUpdated = true;
+      }
     }
   }
 
@@ -63,42 +69,58 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
     }
   }
 
+  /**
+   * TestNG data provider for creation of test classes that represent cucumber entities.
+   * @return array of dummy objects
+   */
   @DataProvider(parallel = true)
   public Object[][] routerDataProvider() {
-    return new Object[initQueues()][];
+    MDC.put(LOGBACK_MDC_KEY, "cucumber-router");
+    try {
+      return new Object[initQueues()][];
+    } finally {
+      MDC.remove(LOGBACK_MDC_KEY);
+    }
   }
 
+
   /**
-   * Try to lock some environment for untested feature during timeout.
+   * Try to lock some environment for untested cuke entity during timeout.
    */
-  @BeforeMethod(alwaysRun = true)
-  public void lockEnvAndPrepareFeature() {
-    log.info("Try to find untested feature and lock appropriate env...");
+  @BeforeClass(alwaysRun = true)
+  public void lockEnvAndPrepareEntity() {
+    MDC.put(LOGBACK_MDC_KEY, "cucumber-router");
+    log.info("Try to find untested entity and lock appropriate env...");
     tlEnvLock.set(
         (EnvironmentLock<T>) CONTROLLER.findUntestedEntityAndLockEnv(
             (TestEntitiesQueues<TestEntityWrapper>) getEnvsQueuesForThisClass())
     );
+    if (tlEnvLock.get().getTargetEntity() != null) {
+      MDC.put(LOGBACK_MDC_KEY, tlEnvLock.get().getTargetEntity().getName());
+    }
   }
 
   /**
    * Finish cucumber-jvm runner.
    */
-  @AfterMethod(alwaysRun = true)
+  @AfterClass(alwaysRun = true)
   public void finishCucumberRunner() {
     if (tlCukeRunner.get() != null) {
       log.debug("Finish current Cucumber runner");
       tlCukeRunner.get().finish();
     }
+    MDC.remove(LOGBACK_MDC_KEY);
   }
 
-  protected void runNextCukeEntity() throws Throwable {
-    log.debug("Try to run feature demo. Lock info: {}", tlEnvLock.get());
+  protected void testCucumberEntity() throws Throwable {
+    log.debug("Try to run cucumber entity. Lock info: {}", tlEnvLock.get());
     Environment env = tlEnvLock.get().getEnvironment();
     LockStatus lockStatus = tlEnvLock.get().getLockStatus();
     switch (lockStatus) {
       case SUCCESS_LOCKED:
         try {
           EnvironmentsUtils.setCurrent(env);
+          // For init purposes
           tlCukeRunner.get().getFeatures();
           runCucumberEntity(tlEnvLock.get().getTargetEntity());
         } finally {
