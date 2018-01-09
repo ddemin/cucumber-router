@@ -3,9 +3,11 @@ package com.github.ddemin.envrouter.base;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_NO_AVAILABLE;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_NO_TARGET_ENTITIES;
+import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_TIMEOUT;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_UNDEFINED_ENV;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.SUCCESS_HARD_LOCKED;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.SUCCESS_LOCKED;
+import static java.lang.String.format;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.Matchers.hasProperty;
@@ -14,7 +16,9 @@ import static org.hamcrest.core.Is.is;
 
 import com.github.ddemin.envrouter.RouterConfig;
 import com.github.ddemin.envrouter.RouterConfig.RouterConfigKeys;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +32,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import org.awaitility.core.ConditionTimeoutException;
 
 /**
  * Created by Dmitrii Demin on 18.09.2017.
@@ -125,7 +130,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    */
   @Synchronized
   public boolean hardLock(@NonNull Environment env) {
-    if (!isAvailable(env)) {
+    if (testDatasLockMap.get(env) < RouterConfig.ENV_THREADS_MAX) {
       return false;
     }
     log.debug("Hard-lock of environment: {}", env);
@@ -204,30 +209,44 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @return environment-for-entity lock with some status
    */
   public @NonNull EnvironmentLock<T> findUntestedEntityAndLockEnv(@NonNull TestEntitiesQueues<T> envQueues) {
-    return await()
-        .pollInSameThread()
-        .timeout(RouterConfig.LOCK_TIMEOUT_MS, TimeUnit.MILLISECONDS)
-        .pollInterval(500, TimeUnit.MILLISECONDS)
-        .until(
-            () -> findEntityAndLockEnv(envQueues),
-            hasProperty(
-                "lockStatus",
-                not(
-                    anyOf(
-                        is(FAILURE_NO_AVAILABLE),
-                        is(FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS)
-                    )
-                )
-            )
-        );
+    EnvironmentLock<T> rez;
+    try {
+      rez = await()
+          .pollInSameThread()
+          .timeout(RouterConfig.LOCK_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+          .pollInterval(500, TimeUnit.MILLISECONDS)
+          .until(
+              () -> findEntityAndLockEnv(envQueues),
+              hasProperty(
+                  "lockStatus",
+                  not(
+                      anyOf(
+                          is(FAILURE_NO_AVAILABLE),
+                          is(FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS)
+                      )
+                  )
+              )
+          );
+    } catch (ConditionTimeoutException timeoutEx) {
+      rez = new EnvironmentLock<>(FAILURE_TIMEOUT);
+      List<T> untestedEntities = envQueues.getQueuesMap().values().stream()
+          .flatMap(Collection::stream)
+          .collect(Collectors.toList());
+      rez.setStatusMessage(
+          format(
+              "Tests routing timeout occurred (%d ms). Untested entities:%n%s",
+              RouterConfig.LOCK_TIMEOUT_MS,
+              Joiner.on(System.lineSeparator()).join(untestedEntities))
+      );
+    }
+    return rez;
   }
 
   @Synchronized
   private @NonNull EnvironmentLock<T> findEntityAndLockEnv(@NonNull TestEntitiesQueues<T> queues) {
     List<Entry<String, Queue<T>>> queuesForUndefEnvs = queues.getQueuesForUndefinedEnvs(getAll());
     Set<Environment> availableEnvs = getAllAvailable();
-    T entityForTest = null;
-    Environment envForTest = null;
+    T entityForTest;
 
     if (queues.entitiesInAllQueues() <= 0) {
       log.error("No any entities in queues");
@@ -235,36 +254,33 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
     } else if (queuesForUndefEnvs.size() > 0) {
       T entity = queuesForUndefEnvs.get(0).getValue().poll();
       log.warn("Entity for undefined env was found: {}", entity);
-      return new EnvironmentLock<>(null, entity, FAILURE_UNDEFINED_ENV);
+      return new EnvironmentLock<>(null, entity, FAILURE_UNDEFINED_ENV, "");
     } else if (availableEnvs.size() <= 0) {
       log.info("No any available environments");
       return new EnvironmentLock<>(FAILURE_NO_AVAILABLE);
     } else {
-      log.debug("Search untested entities for available environments...");
+      log.trace("Search untested entities for available environments...");
       for (Environment env : availableEnvs) {
         entityForTest = queues.pollEntityFor(env.getName());
-        if (entityForTest != null) {
-          envForTest = env;
-          break;
+        if (entityForTest == null) {
+          continue;
+        } else if (entityForTest.isRequiresHardLock() && hardLock(env)) {
+          log.info(
+              "Untested entity was found: {} and environment was HARD-locked: {}",
+              entityForTest,
+              env
+          );
+          return new EnvironmentLock<>(env, entityForTest, SUCCESS_HARD_LOCKED, "");
+        } else if (!entityForTest.isRequiresHardLock() && lock(env)) {
+          log.info(
+              "Untested entity was found: {} and environment was locked: {}",
+              entityForTest,
+              env
+          );
+          return new EnvironmentLock<>(env, entityForTest, SUCCESS_LOCKED, "");
+        } else {
+          queues.add(entityForTest);
         }
-      }
-    }
-
-    if (entityForTest != null && isAvailable(envForTest)) {
-      if (entityForTest.isRequiresHardLock() && hardLock(envForTest)) {
-        log.info(
-            "Untested entity was found: {} and environment was HARD-locked: {}",
-            entityForTest,
-            envForTest
-        );
-        return new EnvironmentLock<>(envForTest, entityForTest, SUCCESS_HARD_LOCKED);
-      } else if (lock(envForTest)) {
-        log.info(
-            "Untested entity was found: {} and environment was locked: {}",
-            entityForTest,
-            envForTest
-        );
-        return new EnvironmentLock<>(envForTest, entityForTest, SUCCESS_LOCKED);
       }
     }
 

@@ -28,8 +28,9 @@ public class ScenarioWrapper extends TestEntityWrapper<PickleEvent> {
   @Override
   public String toString() {
     return format(
-        "%s (Env: %s, Priority: %d)",
+        "%s/'%s' (Env: %s, Priority: %d)",
         getEntity().uri,
+        getEntity().pickle.getName(),
         getRequiredEnvironmentName(),
         getPriority()
     );

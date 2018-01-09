@@ -54,20 +54,17 @@ public class TestEntitiesQueues<T extends TestEntityWrapper> {
    * @return extract entity from environment queue
    */
   public T pollEntityFor(@NonNull String envName) {
-    log.debug("Try to poll entity for environment: {}", envName);
+    log.trace("Try to poll entity for environment: {}", envName);
 
     T chosenEntity;
     Queue<T> queueForEnv = getQueueFor(envName);
     Queue<T> queueForAnyEnv = getQueueFor(ANY_ENV);
 
     if (queueForEnv == null && queueForAnyEnv == null) {
-      log.warn("No entity found for env-s: ANY & {}", envName);
       chosenEntity = null;
     } else if (queueForEnv == null) {
-      log.debug("Try to poll entity from queue for ANY environment");
       chosenEntity = queueForAnyEnv.poll();
     } else if (queueForAnyEnv == null) {
-      log.debug("Try to poll entity from queue for environment {}", envName);
       chosenEntity = queueForEnv.poll();
     } else {
       chosenEntity =
@@ -116,7 +113,7 @@ public class TestEntitiesQueues<T extends TestEntityWrapper> {
    * @return list of queues for environments that don't exist (weren't provided)
    */
   public List<Entry<String, Queue<T>>> getQueuesForUndefinedEnvs(@NonNull Set<Environment> definedEnvs) {
-    log.debug("Get all queues for undefined environments...");
+    log.trace("Get all queues for undefined environments...");
     return this.getQueuesMap().entrySet().stream()
         .filter(
             entry ->

@@ -15,8 +15,14 @@ public class EnvironmentLock<T> {
   private T targetEntity;
   private LockStatus lockStatus;
 
+  private String statusMessage;
+
   public EnvironmentLock(@NonNull LockStatus lockStatus) {
     this.lockStatus = lockStatus;
+  }
+
+  public void setStatusMessage(String statusMessage) {
+    this.statusMessage = statusMessage;
   }
 
   public enum LockStatus {
@@ -25,7 +31,8 @@ public class EnvironmentLock<T> {
     FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS,
     FAILURE_NO_AVAILABLE,
     FAILURE_NO_TARGET_ENTITIES,
-    FAILURE_UNDEFINED_ENV
+    FAILURE_UNDEFINED_ENV,
+    FAILURE_TIMEOUT
   }
 
 }

@@ -1,5 +1,6 @@
 package com.github.ddemin.envrouter;
 
+import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_TIMEOUT;
 import static com.github.ddemin.envrouter.base.TestEntityWrapper.ANY_ENV;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -144,17 +145,18 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
     );
   }
 
-  @Test(
-      expectedExceptions = ConditionTimeoutException.class,
-      expectedExceptionsMessageRegExp = ".*within 700 milliseconds.*",
-      priority = 999
-  )
+  @Test(priority = 999)
   public void checkPullingTimeoutIfAllEnvsAreBusy() throws IllegalAccessException {
     changeRouterConfigConstants("LOCK_TIMEOUT_MS", 700);
     TestEntitiesQueues<TestEntityWrapper<String>> queues = new TestEntitiesQueues<>();
     queues.add(wrpEnv2P1);
 
     controller.lock(controller.getByName(ENV2));
-    controller.findUntestedEntityAndLockEnv(queues);
+    EnvironmentLock lock = controller.findUntestedEntityAndLockEnv(queues);
+    assertThat(
+        lock.getLockStatus(),
+        is(FAILURE_TIMEOUT)
+    );
   }
+
 }

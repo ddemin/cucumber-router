@@ -16,6 +16,7 @@ import cucumber.api.testng.TestNGCucumberRunner;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.testng.ITest;
@@ -61,11 +62,13 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
   @Override
   public String getTestName() {
     if (tlEnvLock.get() == null) {
-      return "TestNG fixture";
+      return "TestNG fixture " + UUID.randomUUID().toString();
     } else if (tlEnvLock.get().getTargetEntity() != null) {
       return tlEnvLock.get().getTargetEntity().getName();
+    } else if (tlEnvLock.get().getLockStatus() == LockStatus.FAILURE_TIMEOUT) {
+      return "Tests routing timeout occurred " + UUID.randomUUID().toString();
     } else {
-      return "Undefined entity. Global error occurred";
+      return "Undefined entity. Global error occurred " + UUID.randomUUID().toString();
     }
   }
 
