@@ -65,6 +65,7 @@ test {
 
 task demoViaFeatures(type: Test) {
     systemProperties System.getProperties()
+    systemProperties.put("router.threadsPerEnv", 2)
     useTestNG() {
         setUseDefaultListeners(false)
         setParallel("instances")
@@ -75,11 +76,12 @@ task demoViaFeatures(type: Test) {
 
 task demoViaScenarios(type: Test) {
     systemProperties System.getProperties()
+    systemProperties.put("router.threadsPerEnv", 2)
     useTestNG() {
         setUseDefaultListeners(false)
         setParallel("instances")
         includeGroups("demoViaScenarios")
-        setThreadCount(3)
+        setThreadCount(4)
     }
 }
 

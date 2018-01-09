@@ -4,6 +4,7 @@ import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILUR
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_NO_TARGET_ENTITIES;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.FAILURE_UNDEFINED_ENV;
+import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.SUCCESS_HARD_LOCKED;
 import static com.github.ddemin.envrouter.base.EnvironmentLock.LockStatus.SUCCESS_LOCKED;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -117,6 +118,22 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
   }
 
   /**
+   * Try to hard-lock environment. All slots will be used!
+   *
+   * @param env environment for locking
+   * @return success of environment lock
+   */
+  @Synchronized
+  public boolean hardLock(@NonNull Environment env) {
+    if (!isAvailable(env)) {
+      return false;
+    }
+    log.debug("Hard-lock of environment: {}", env);
+    testDatasLockMap.put(env, testDatasLockMap.get(env) * -1);
+    return true;
+  }
+
+  /**
    * Try to lock environment.
    *
    * @param env environment for locking
@@ -141,8 +158,15 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
   public void release(@NonNull Environment env) {
     log.debug("Release environment: {}", env);
     int envFreeThreads = testDatasLockMap.get(env);
-    if (envFreeThreads < RouterConfig.ENV_THREADS_MAX) {
-      testDatasLockMap.put(env, envFreeThreads + 1);
+    if (Math.abs(envFreeThreads) < RouterConfig.ENV_THREADS_MAX) {
+      if (envFreeThreads < 0) {
+        log.debug("Release after hard-lock: {}", env);
+        testDatasLockMap.put(env, envFreeThreads * -1);
+      } else {
+        testDatasLockMap.put(env, envFreeThreads + 1);
+      }
+    } else {
+      testDatasLockMap.put(env, RouterConfig.ENV_THREADS_MAX);
     }
   }
 
@@ -226,16 +250,25 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
       }
     }
 
-    if (entityForTest != null && lock(envForTest)) {
-      log.info(
-          "Untested entity was found: {} and environment was locked: {}",
-          entityForTest,
-          envForTest
-      );
-      return new EnvironmentLock<>(envForTest, entityForTest, SUCCESS_LOCKED);
-    } else {
-      return new EnvironmentLock<>(FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS);
+    if (entityForTest != null && isAvailable(envForTest)) {
+      if (entityForTest.isRequiresHardLock() && hardLock(envForTest)) {
+        log.info(
+            "Untested entity was found: {} and environment was HARD-locked: {}",
+            entityForTest,
+            envForTest
+        );
+        return new EnvironmentLock<>(envForTest, entityForTest, SUCCESS_HARD_LOCKED);
+      } else if (lock(envForTest)) {
+        log.info(
+            "Untested entity was found: {} and environment was locked: {}",
+            entityForTest,
+            envForTest
+        );
+        return new EnvironmentLock<>(envForTest, entityForTest, SUCCESS_LOCKED);
+      }
     }
+
+    return new EnvironmentLock<>(FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS);
   }
 
 }

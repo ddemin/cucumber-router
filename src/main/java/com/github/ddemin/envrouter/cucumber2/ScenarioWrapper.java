@@ -17,8 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ScenarioWrapper extends TestEntityWrapper<PickleEvent> {
 
   @SuppressFBWarnings
-  public ScenarioWrapper(@NonNull PickleEvent entity, String requiredEnvironmentName, int priority) {
-    super(entity, requiredEnvironmentName, priority);
+  public ScenarioWrapper(
+      @NonNull PickleEvent entity,
+      String requiredEnvironmentName,
+      int priority,
+      boolean requiresHardLocking) {
+    super(entity, requiredEnvironmentName, priority, requiresHardLocking);
   }
 
   @Override

@@ -20,6 +20,8 @@ public class TestEntityWrapper<T> {
   private T entity;
   private String requiredEnvironmentName;
   private int priority;
+  // TODO Unit-test
+  private boolean requiresHardLock;
 
   public String getName() {
     return "";
@@ -37,7 +39,29 @@ public class TestEntityWrapper<T> {
    * @param priority entity's priority. Lower - more chances to be tested first
    */
   @SuppressFBWarnings
-  public TestEntityWrapper(@NonNull T entity, String requiredEnvironmentName, int priority) {
+  public TestEntityWrapper(
+      @NonNull T entity,
+      String requiredEnvironmentName,
+      int priority
+  ) {
+    this(entity, requiredEnvironmentName, priority, false);
+  }
+
+  /**
+   * Creates wrapper for test entity.
+   *
+   * @param entity entity
+   * @param requiredEnvironmentName name of environment that required for this entity
+   * @param priority entity's priority. Lower - more chances to be tested first
+   * @param requiresHardLock entity requires hard-lock of target environment
+   */
+  @SuppressFBWarnings
+  public TestEntityWrapper(
+      @NonNull T entity,
+      String requiredEnvironmentName,
+      int priority,
+      boolean requiresHardLock
+  ) {
     this.entity = entity;
 
     if (RouterConfig.ENV_FORCED != null) {
@@ -48,6 +72,7 @@ public class TestEntityWrapper<T> {
           : requiredEnvironmentName.toLowerCase();
     }
     this.priority = priority;
+    this.requiresHardLock = requiresHardLock;
   }
 
   @Override

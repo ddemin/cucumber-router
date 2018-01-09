@@ -117,6 +117,7 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
     Environment env = tlEnvLock.get().getEnvironment();
     LockStatus lockStatus = tlEnvLock.get().getLockStatus();
     switch (lockStatus) {
+      case SUCCESS_HARD_LOCKED:
       case SUCCESS_LOCKED:
         try {
           EnvironmentsUtils.setCurrent(env);

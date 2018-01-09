@@ -17,8 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 public class FeatureWrapper extends TestEntityWrapper<CucumberFeature> {
 
   @SuppressFBWarnings
-  public FeatureWrapper(@NonNull CucumberFeature entity, String requiredEnvironmentName, int priority) {
-    super(entity, requiredEnvironmentName, priority);
+  public FeatureWrapper(
+      @NonNull CucumberFeature entity,
+      String requiredEnvironmentName,
+      int priority,
+      boolean requiresHardLocking
+  ) {
+    super(entity, requiredEnvironmentName, priority, requiresHardLocking);
   }
 
   @Override

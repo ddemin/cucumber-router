@@ -1,10 +1,16 @@
 package com.github.ddemin.envrouter.cucumber2;
 
+import static com.github.ddemin.envrouter.cucumber2.CukeTags.CUKE_ENV_TAG;
+import static com.github.ddemin.envrouter.cucumber2.CukeTags.CUKE_HARDLOCK_TAG;
+import static com.github.ddemin.envrouter.cucumber2.CukeTags.CUKE_PRIORITY_TAG;
+
 import cucumber.runtime.model.CucumberFeature;
+import gherkin.events.PickleEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,13 +18,9 @@ import org.apache.commons.lang3.StringUtils;
  * Created by Dmitrii Demin on 18.09.2017.
  */
 @Slf4j
+@UtilityClass
+// TODO Deduplicate
 public class FeaturesUtils {
-
-  private static final String CUKE_ENV_TAG = "@Env";
-  private static final String CUKE_PRIORITY_TAG = "@Priority";
-
-  private FeaturesUtils() {
-  }
 
   /**
    * Wrap cucumber-jvm feature and parse its priority tag and required environment tag.
@@ -31,7 +33,8 @@ public class FeaturesUtils {
     return new FeatureWrapper(
         feature,
         getFeatureRequiredEnvironment(feature),
-        getFeaturePriority(feature)
+        getFeaturePriority(feature),
+        getHardLockingRequirement(feature)
     );
   }
 
@@ -60,6 +63,10 @@ public class FeaturesUtils {
 
   static String getFeatureRequiredEnvironment(@NonNull CucumberFeature feature) {
     return extractTagEnding(feature, CUKE_ENV_TAG).orElse(null);
+  }
+
+  static boolean getHardLockingRequirement(@NonNull CucumberFeature feature) {
+    return extractTagEnding(feature, CUKE_HARDLOCK_TAG).isPresent();
   }
 
   private static Optional<String> extractTagEnding(@NonNull CucumberFeature feature,

@@ -21,6 +21,7 @@ public class EnvironmentLock<T> {
 
   public enum LockStatus {
     SUCCESS_LOCKED,
+    SUCCESS_HARD_LOCKED,
     FAILURE_NO_ENTITY_FOR_AVAILABLE_ENVS,
     FAILURE_NO_AVAILABLE,
     FAILURE_NO_TARGET_ENTITIES,

@@ -115,6 +115,44 @@ public class EnvsLocksControllerTests extends UnitTestsBase {
   }
 
   @Test
+  public void checkHardLocking() throws IllegalAccessException {
+    Environment env1 = controller.getByName(ENV1);
+
+    assertThat(
+        "1st hard-locking must be successful",
+        controller.hardLock(env1),
+        is(true)
+    );
+    assertThat(
+        "Environment must be not available after hard-lock",
+        controller.isAvailable(env1),
+        is(false)
+    );
+    assertThat(
+        "2nd locking must be not successful",
+        controller.lock(env1),
+        is(false)
+    );
+
+    controller.release(env1);
+    assertThat(
+        "Environment must be available after releasing after hard-lock",
+        controller.isAvailable(env1),
+        is(true)
+    );
+    assertThat(
+        "Locking must be successful (1/2)",
+        controller.lock(env1),
+        is(true)
+    );
+    assertThat(
+        "Locking must be successful (2/2)",
+        controller.lock(env1),
+        is(true)
+    );
+  }
+
+  @Test
   public void checkConstructorAndGetterByName() {
     assertThat(
         controller.getAll(),
