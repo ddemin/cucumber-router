@@ -58,7 +58,7 @@ public class EnvsLocksController {
     testDatasLockMap = new TreeMap<>((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
     testDatasLockMap.putAll(
         Maps.asMap(
-            EnvironmentsUtils.initAllFromDirectory(RouterConfig.ENVS_DIRECTORY),
+            EnvironmentsUtils.getAllEnvironments(),
             e -> RouterConfig.ENV_THREADS_MAX
         )
     );

@@ -1,6 +1,5 @@
 # language: en
 @EnvTest1
-@Priority1
 @SingleThread
 Feature: Some feature for Test1 with priority 1
 

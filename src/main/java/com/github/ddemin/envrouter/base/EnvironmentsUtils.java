@@ -1,5 +1,6 @@
 package com.github.ddemin.envrouter.base;
 
+import com.github.ddemin.envrouter.RouterConfig;
 import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberFeatureTest;
 import com.github.ddemin.testutil.io.FileSystemUtils;
 import com.github.ddemin.testutil.io.PropertiesUtils;
@@ -9,24 +10,32 @@ import java.net.URL;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
+@UtilityClass
 public class EnvironmentsUtils {
 
   private static final ThreadLocal<Environment> tlEnvs = ThreadLocal.withInitial(() -> null);
 
-  private EnvironmentsUtils() {
+  /**
+   * Create set of Environments after scanning of default directory with environments subdir-s.
+   *
+   * @return environment objects that based on subdir-s in provided directory
+   */
+  public static Set<Environment> getAllEnvironments() {
+    return getAllEnvironmentsFromDirectory(RouterConfig.ENVS_DIRECTORY);
   }
 
   /**
-   * Create Environments after scanning of directory with subdir-s.
+   * Create set of Environments after scanning of directory with subdir-s.
    *
    * @param pathToDir path to directory with subdir-s
    * @return environment objects that based on subdir-s in provided directory
    */
-  public static Set<Environment> initAllFromDirectory(String pathToDir) {
+  public static Set<Environment> getAllEnvironmentsFromDirectory(String pathToDir) {
     log.debug("Find environments directories in {}", pathToDir);
 
     URL dirUrl = AbstractCucumberFeatureTest.class.getClassLoader().getResource(pathToDir);
@@ -47,7 +56,7 @@ public class EnvironmentsUtils {
           try {
             env.withProperties(
                 PropertiesUtils.readProperties(
-                    AbstractCucumberFeatureTest.class
+                    EnvironmentsUtils.class
                         .getClassLoader()
                         .getResource(pathToDir)
                         .toURI()
