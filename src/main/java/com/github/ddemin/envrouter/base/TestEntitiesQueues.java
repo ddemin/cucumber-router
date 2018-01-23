@@ -2,7 +2,6 @@ package com.github.ddemin.envrouter.base;
 
 import static com.github.ddemin.envrouter.base.TestEntityWrapper.ANY_ENV;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,18 @@ public class TestEntitiesQueues<T extends TestEntityWrapper> {
     if (entitiesQueuesForEnvs.get(requiredEnv) == null) {
       entitiesQueuesForEnvs.put(
           requiredEnv,
-          new PriorityQueue<>(Comparator.comparingInt(T::getPriority))
+          new PriorityQueue<>(
+              (o1, o2) -> {
+                int compareInt = Integer.compare(o1.getPriority(), o2.getPriority());
+                if (compareInt == 0 && o1.isRequiresHardLock() && o2.isRequiresHardLock()) {
+                  compareInt = 0;
+                } else if (compareInt == 0 && o1.isRequiresHardLock()) {
+                  compareInt = 1;
+                } else if (compareInt == 0 && o2.isRequiresHardLock()) {
+                  compareInt = -1;
+                }
+                return compareInt;
+              })
       );
     }
     entitiesQueuesForEnvs.get(requiredEnv).add(entity);

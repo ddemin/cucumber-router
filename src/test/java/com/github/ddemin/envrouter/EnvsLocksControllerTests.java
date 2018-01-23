@@ -22,13 +22,10 @@ public class EnvsLocksControllerTests extends UnitTestsBase {
 
   private static final String ENV1 = "test1";
 
-  private final EnvsLocksController<TestEntityWrapper<String>> controller;
-
   public EnvsLocksControllerTests() {
     super();
     try {
       changeRouterConfigConstants("ENV_THREADS_MAX", 2);
-      controller = new EnvsLocksController<>();
     } catch (IllegalAccessException e) {
       throw new RuntimeException(e);
     }
@@ -37,38 +34,38 @@ public class EnvsLocksControllerTests extends UnitTestsBase {
   @BeforeMethod
   public void releaseEnvs() throws IllegalAccessException {
     changeRouterConfigConstants("ENV_THREADS_MAX", 2);
-    controller.resetLockingOfAll();
+    EnvsLocksController.resetLockingOfAll();
   }
 
   @Test
   public void checkLocking() throws IllegalAccessException {
-    Environment env1 = controller.getByName(ENV1);
+    Environment env1 = EnvsLocksController.getByName(ENV1);
 
     assertThat(
         "1st locking must be successful (limit = 2)",
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(true)
     );
     assertThat(
         "Environment must be available after 1st lock (limit = 2)",
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(true)
     );
 
     assertThat(
         "2nd locking must be successful (limit = 2)",
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(true)
     );
     assertThat(
         "Environment must be not  available after 2nd lock (limit = 2)",
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(false)
     );
 
     assertThat(
         "3rd locking must be not successful (limit = 2)",
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(false)
     );
   }
@@ -76,78 +73,78 @@ public class EnvsLocksControllerTests extends UnitTestsBase {
   @Test
   public void checkReleasing() throws IllegalAccessException {
     changeRouterConfigConstants("ENV_THREADS_MAX", 2);
-    Environment env1 = controller.getByName(ENV1);
+    Environment env1 = EnvsLocksController.getByName(ENV1);
 
-    controller.lock(env1);
-    controller.lock(env1);
+    EnvsLocksController.lock(env1);
+    EnvsLocksController.lock(env1);
     assertThat(
         "Environment must be not  available after 2nd lock (limit = 2)",
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(false)
     );
 
-    controller.release(env1);
+    EnvsLocksController.release(env1);
     assertThat(
         "Environment must be available after releasing of 1 thread",
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(true)
     );
 
-    controller.lock(env1);
+    EnvsLocksController.lock(env1);
     assertThat(
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(false)
     );
 
-    controller.resetLock(env1);
+    EnvsLocksController.resetLock(env1);
     assertThat(
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(true)
     );
     assertThat(
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(true)
     );
     assertThat(
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(true)
     );
   }
 
   @Test
   public void checkHardLocking() throws IllegalAccessException {
-    Environment env1 = controller.getByName(ENV1);
+    Environment env1 = EnvsLocksController.getByName(ENV1);
 
     assertThat(
         "1st hard-locking must be successful",
-        controller.hardLock(env1),
+        EnvsLocksController.hardLock(env1),
         is(true)
     );
     assertThat(
         "Environment must be not available after hard-lock",
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(false)
     );
     assertThat(
         "2nd locking must be not successful",
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(false)
     );
 
-    controller.release(env1);
+    EnvsLocksController.release(env1);
     assertThat(
         "Environment must be available after releasing after hard-lock",
-        controller.isAvailable(env1),
+        EnvsLocksController.isAvailable(env1),
         is(true)
     );
     assertThat(
         "Locking must be successful (1/2)",
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(true)
     );
     assertThat(
         "Locking must be successful (2/2)",
-        controller.lock(env1),
+        EnvsLocksController.lock(env1),
         is(true)
     );
   }
@@ -155,27 +152,27 @@ public class EnvsLocksControllerTests extends UnitTestsBase {
   @Test
   public void checkConstructorAndGetterByName() {
     assertThat(
-        controller.getAll(),
+        EnvsLocksController.getAll(),
         hasSize(3)
     );
     assertThat(
-        controller.getAll().stream().map(Environment::getName).collect(Collectors.toList()),
+        EnvsLocksController.getAll().stream().map(Environment::getName).collect(Collectors.toList()),
         containsInAnyOrder("test1", "test2", "test3")
     );
     assertThat(
         "Environment that constructed in controller"
             + " must have properties from files that stored in common directory",
-        controller.getByName(ENV1).getProperties(),
+        EnvsLocksController.getByName(ENV1).getProperties(),
         hasKey("common.property")
     );
     assertThat(
         "Environment constructed in controller must have correct path",
-        controller.getByName(ENV1).getPathToPropertiesDir().toString(),
+        EnvsLocksController.getByName(ENV1).getPathToPropertiesDir().toString(),
         endsWith(ENV1)
     );
     assertThat(
         "Environment constructed in controller must have name",
-        controller.getByName(ENV1).getName(),
+        EnvsLocksController.getByName(ENV1).getName(),
         equalTo(ENV1)
     );
   }
@@ -188,7 +185,7 @@ public class EnvsLocksControllerTests extends UnitTestsBase {
   @SuppressFBWarnings
   public void checkConstructorForEmptyDir() throws IllegalAccessException {
     changeRouterConfigConstants("ENVS_DIRECTORY", "features");
-    new EnvsLocksController<>();
+    EnvsLocksController.reinit();
   }
 
   @Test(
@@ -199,7 +196,7 @@ public class EnvsLocksControllerTests extends UnitTestsBase {
   @SuppressFBWarnings
   public void checkConstructorForIncorrectDir() throws IllegalAccessException {
     changeRouterConfigConstants("ENVS_DIRECTORY", "abcdef");
-    new EnvsLocksController<>();
+    EnvsLocksController.reinit();
   }
 
 }

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Synchronized;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.core.ConditionTimeoutException;
 
@@ -39,24 +40,29 @@ import org.awaitility.core.ConditionTimeoutException;
  */
 @Slf4j
 @Getter
-public class EnvsLocksController<T extends TestEntityWrapper> {
+@UtilityClass
+public class EnvsLocksController {
 
-  private final Map<Environment, Integer> testDatasLockMap;
+  private static Map<Environment, Integer> testDatasLockMap;
+
+  static {
+    reinit();
+  }
 
   /**
    * Creates controller that handle availability of environments for usage in demo threads. ENVS_DIRECTORY and
    * ENV_THREADS_MAX from RouterConfig will be used.
    */
-  public EnvsLocksController() {
+  public static void reinit() {
     log.debug("Create lock controller...");
-    this.testDatasLockMap = new TreeMap<>((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
-    this.testDatasLockMap.putAll(
+    testDatasLockMap = new TreeMap<>((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+    testDatasLockMap.putAll(
         Maps.asMap(
             EnvironmentsUtils.initAllFromDirectory(RouterConfig.ENVS_DIRECTORY),
             e -> RouterConfig.ENV_THREADS_MAX
         )
     );
-    if (this.testDatasLockMap.isEmpty()) {
+    if (testDatasLockMap.isEmpty()) {
       throw new IllegalStateException(
           "No any environments were found and initiated, check property: "
               + RouterConfigKeys.ENVS_DIRECTORY_KEY
@@ -69,7 +75,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    *
    * @return set of environments
    */
-  public Set<Environment> getAll() {
+  public static Set<Environment> getAll() {
     return testDatasLockMap.keySet();
   }
 
@@ -79,7 +85,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @param envName environment name
    * @return environment object
    */
-  public Environment getByName(@NonNull String envName) {
+  public static Environment getByName(@NonNull String envName) {
     return getAll().stream()
         .filter(it -> it.getName().equalsIgnoreCase(envName))
         .findFirst()
@@ -93,7 +99,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @return possibility to use this environment in one more demo thread
    */
   @Synchronized
-  public boolean isAvailable(@NonNull Environment env) {
+  public static boolean isAvailable(@NonNull Environment env) {
     return testDatasLockMap.get(env) > 0;
   }
 
@@ -104,7 +110,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @return possibility to use this environment in one more demo thread
    */
   @Synchronized
-  public boolean isAvailable(@NonNull String envName) {
+  public static boolean isAvailable(@NonNull String envName) {
     Environment td = getByName(envName);
     return td != null && isAvailable(td);
   }
@@ -115,10 +121,10 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @return set of all environments that can be used in one more demo thread
    */
   @Synchronized
-  public Set<Environment> getAllAvailable() {
+  public static Set<Environment> getAllAvailable() {
     return testDatasLockMap.entrySet().stream()
         .map(Entry::getKey)
-        .filter(this::isAvailable)
+        .filter(EnvsLocksController::isAvailable)
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
@@ -129,7 +135,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @return success of environment lock
    */
   @Synchronized
-  public boolean hardLock(@NonNull Environment env) {
+  public static boolean hardLock(@NonNull Environment env) {
     if (testDatasLockMap.get(env) < RouterConfig.ENV_THREADS_MAX) {
       return false;
     }
@@ -145,7 +151,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @return success of environment lock
    */
   @Synchronized
-  public boolean lock(@NonNull Environment env) {
+  public static boolean lock(@NonNull Environment env) {
     if (!isAvailable(env)) {
       return false;
     }
@@ -160,7 +166,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @param env environment for release
    */
   @Synchronized
-  public void release(@NonNull Environment env) {
+  public static void release(@NonNull Environment env) {
     log.debug("Release environment: {}", env);
     int envFreeThreads = testDatasLockMap.get(env);
     if (Math.abs(envFreeThreads) < RouterConfig.ENV_THREADS_MAX) {
@@ -181,7 +187,7 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @param env environment for reset
    */
   @Synchronized
-  public void resetLock(@NonNull Environment env) {
+  public static void resetLock(@NonNull Environment env) {
     log.debug("Reset locking of environment: {}", env);
     testDatasLockMap.put(env, RouterConfig.ENV_THREADS_MAX);
   }
@@ -190,16 +196,16 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * Release all environments.
    */
   @Synchronized
-  public void releaseAll() {
-    testDatasLockMap.keySet().forEach(this::release);
+  public static void releaseAll() {
+    testDatasLockMap.keySet().forEach(EnvsLocksController::release);
   }
 
   /**
    * Reset locking of all environments.
    */
   @Synchronized
-  public void resetLockingOfAll() {
-    testDatasLockMap.keySet().forEach(this::resetLock);
+  public static void resetLockingOfAll() {
+    testDatasLockMap.keySet().forEach(EnvsLocksController::resetLock);
   }
 
   /**
@@ -208,7 +214,9 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
    * @param envQueues queues with untested entities
    * @return environment-for-entity lock with some status
    */
-  public @NonNull EnvironmentLock<T> findUntestedEntityAndLockEnv(@NonNull TestEntitiesQueues<T> envQueues) {
+  public static <T extends TestEntityWrapper> EnvironmentLock<T> findUntestedEntityAndLockEnv(
+      @NonNull TestEntitiesQueues<T> envQueues
+  ) {
     EnvironmentLock<T> rez;
     try {
       rez = await()
@@ -243,7 +251,9 @@ public class EnvsLocksController<T extends TestEntityWrapper> {
   }
 
   @Synchronized
-  private @NonNull EnvironmentLock<T> findEntityAndLockEnv(@NonNull TestEntitiesQueues<T> queues) {
+  private static <T extends TestEntityWrapper>  EnvironmentLock<T> findEntityAndLockEnv(
+      @NonNull TestEntitiesQueues<T> queues
+  ) {
     List<Entry<String, Queue<T>>> queuesForUndefEnvs = queues.getQueuesForUndefinedEnvs(getAll());
     Set<Environment> availableEnvs = getAllAvailable();
     T entityForTest;

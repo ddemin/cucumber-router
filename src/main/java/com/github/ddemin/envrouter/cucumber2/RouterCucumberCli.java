@@ -45,12 +45,10 @@ public class RouterCucumberCli extends AbstractCucumberFeatureTest {
     Runtime runtime = new Runtime(resourceLoader, classFinder, classLoader, runtimeOptions) {
       @Override
       public void runFeature(CucumberFeature feature) {
-        EnvsLocksController<FeatureWrapper> controller = new EnvsLocksController<>();
-
         TestEntitiesQueues<FeatureWrapper> queues = new TestEntitiesQueues<>();
         queues.add(FeaturesUtils.wrapFeature(feature));
 
-        EnvironmentLock<FeatureWrapper> lock = controller.findUntestedEntityAndLockEnv(queues);
+        EnvironmentLock<FeatureWrapper> lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
         INSTANCE.processFailedLocking(lock);
 
         EnvironmentsUtils.setCurrent(lock.getEnvironment());

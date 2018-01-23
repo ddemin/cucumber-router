@@ -27,8 +27,6 @@ import org.testng.annotations.DataProvider;
 @Slf4j
 public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implements ITest {
 
-  // TODO Prettify
-  private static final EnvsLocksController<TestEntityWrapper> CONTROLLER = new EnvsLocksController<>();
   private static final Map<Class<? extends AbstractCucumberTest>, TestEntitiesQueues<? extends TestEntityWrapper>>
       QUEUES = new HashMap<>();
   private static final String LOGBACK_MDC_KEY = "mdc";
@@ -95,8 +93,7 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
     MDC.put(LOGBACK_MDC_KEY, "cucumber-router");
     log.info("Try to find untested entity and lock appropriate env...");
     tlEnvLock.set(
-        (EnvironmentLock<T>) CONTROLLER.findUntestedEntityAndLockEnv(
-            (TestEntitiesQueues<TestEntityWrapper>) getEnvsQueuesForThisClass())
+        EnvsLocksController.findUntestedEntityAndLockEnv(getEnvsQueuesForThisClass())
     );
     if (tlEnvLock.get().getTargetEntity() != null) {
       MDC.put(LOGBACK_MDC_KEY, tlEnvLock.get().getTargetEntity().getName());
@@ -128,7 +125,7 @@ public abstract class AbstractCucumberTest<T extends TestEntityWrapper> implemen
           tlCukeRunner.get().getFeatures();
           runCucumberEntity(tlEnvLock.get().getTargetEntity());
         } finally {
-          CONTROLLER.release(env);
+          EnvsLocksController.release(env);
         }
         break;
       default:

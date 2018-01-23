@@ -22,7 +22,6 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
   private static final String ENV2 = "test2";
   private static final String ENV_UNK = "unknown";
 
-  private final EnvsLocksController<TestEntityWrapper<String>> controller;
   private TestEntityWrapper<String> wrpEnv1P1 = new TestEntityWrapper<>("demo", ENV1, 1);
   private TestEntityWrapper<String> wrpEnv2P1 = new TestEntityWrapper<>("demo", ENV2, 1);
   private TestEntityWrapper<String> wrpEnvAnyP1 = new TestEntityWrapper<>("demo", ANY_ENV, 1);
@@ -31,19 +30,19 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
 
   public EnvsLocksControllerFindingTests() {
     super();
-    controller = new EnvsLocksController<>();
   }
 
   @BeforeMethod
   public void releaseEnvs() {
-    controller.resetLockingOfAll();
+    EnvsLocksController.reinit();
+    EnvsLocksController.resetLockingOfAll();
   }
 
   public void checkPullingIfQueuesHasUndefined() throws IllegalAccessException {
     TestEntitiesQueues<TestEntityWrapper<String>> queues = new TestEntitiesQueues<>();
     queues.add(wrpEnvUnk);
 
-    EnvironmentLock<TestEntityWrapper<String>> lock = controller.findUntestedEntityAndLockEnv(queues);
+    EnvironmentLock<TestEntityWrapper<String>> lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         lock.getLockStatus(),
         equalTo(LockStatus.FAILURE_UNDEFINED_ENV)
@@ -60,7 +59,7 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
 
   public void checkPullingIfQueuesEmpty() throws IllegalAccessException {
     TestEntitiesQueues<TestEntityWrapper<String>> queues = new TestEntitiesQueues<>();
-    EnvironmentLock<TestEntityWrapper<String>> lock = controller.findUntestedEntityAndLockEnv(queues);
+    EnvironmentLock<TestEntityWrapper<String>> lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         lock.getLockStatus(),
         equalTo(LockStatus.FAILURE_NO_TARGET_ENTITIES)
@@ -73,7 +72,7 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
     queues.add(wrpEnv1P1);
     queues.add(wrpEnvAnyP1);
 
-    EnvironmentLock<TestEntityWrapper<String>> lock = controller.findUntestedEntityAndLockEnv(queues);
+    EnvironmentLock<TestEntityWrapper<String>> lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         lock.getLockStatus(),
         equalTo(LockStatus.SUCCESS_LOCKED)
@@ -83,21 +82,21 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
         lock.getTargetEntity(),
         equalTo(wrpEnv1P1)
     );
-    controller.release(lock.getEnvironment());
+    EnvsLocksController.release(lock.getEnvironment());
 
-    lock = controller.findUntestedEntityAndLockEnv(queues);
-    controller.release(lock.getEnvironment());
+    lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
+    EnvsLocksController.release(lock.getEnvironment());
     assertThat(
         lock.getTargetEntity(),
         equalTo(wrpEnvAnyP1)
     );
 
-    lock = controller.findUntestedEntityAndLockEnv(queues);
+    lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         lock.getTargetEntity(),
         equalTo(wrpEnvAnyP2)
     );
-    controller.release(lock.getEnvironment());
+    EnvsLocksController.release(lock.getEnvironment());
 
     assertThat(
         queues.entitiesInAllQueues(),
@@ -111,7 +110,7 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
     queues.add(wrpEnv2P1);
     queues.add(wrpEnvAnyP1);
 
-    EnvironmentLock<TestEntityWrapper<String>> lock = controller.findUntestedEntityAndLockEnv(queues);
+    EnvironmentLock<TestEntityWrapper<String>> lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         lock.getLockStatus(),
         equalTo(LockStatus.SUCCESS_LOCKED)
@@ -121,23 +120,23 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
         lock.getTargetEntity(),
         equalTo(wrpEnvAnyP1)
     );
-    controller.release(lock.getEnvironment());
+    EnvsLocksController.release(lock.getEnvironment());
 
-    lock = controller.findUntestedEntityAndLockEnv(queues);
+    lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         "Must be entity for ANY environment, because queues don't contain entities strictly test1 strictly",
         lock.getTargetEntity(),
         equalTo(wrpEnvAnyP2)
     );
-    controller.release(lock.getEnvironment());
+    EnvsLocksController.release(lock.getEnvironment());
 
-    lock = controller.findUntestedEntityAndLockEnv(queues);
+    lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         "Must be entity for test2 env, because queues don't contain entities for test1, but one for test2",
         lock.getTargetEntity(),
         equalTo(wrpEnv2P1)
     );
-    controller.release(lock.getEnvironment());
+    EnvsLocksController.release(lock.getEnvironment());
 
     assertThat(
         queues.entitiesInAllQueues(),
@@ -151,8 +150,8 @@ public class EnvsLocksControllerFindingTests extends UnitTestsBase {
     TestEntitiesQueues<TestEntityWrapper<String>> queues = new TestEntitiesQueues<>();
     queues.add(wrpEnv2P1);
 
-    controller.lock(controller.getByName(ENV2));
-    EnvironmentLock lock = controller.findUntestedEntityAndLockEnv(queues);
+    EnvsLocksController.lock(EnvsLocksController.getByName(ENV2));
+    EnvironmentLock lock = EnvsLocksController.findUntestedEntityAndLockEnv(queues);
     assertThat(
         lock.getLockStatus(),
         is(FAILURE_TIMEOUT)
