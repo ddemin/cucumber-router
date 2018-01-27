@@ -12,24 +12,32 @@
     },
     "compile": {
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
+        },
+        "io.cucumber:cucumber-java": {
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -66,8 +74,8 @@
     },
     "compileClasspath": {
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.code.findbugs:findbugs": {
             "locked": "3.0.1",
@@ -77,17 +85,25 @@
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
+        },
+        "io.cucumber:cucumber-java": {
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -124,24 +140,32 @@
     },
     "default": {
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
+        },
+        "io.cucumber:cucumber-java": {
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -204,24 +228,32 @@
     },
     "runtime": {
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
+        },
+        "io.cucumber:cucumber-java": {
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -258,24 +290,32 @@
     },
     "runtimeClasspath": {
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
+        },
+        "io.cucumber:cucumber-java": {
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -320,28 +360,32 @@
             "requested": "1.1.8"
         },
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-java": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -394,8 +438,8 @@
             "requested": "1.1.8"
         },
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.code.findbugs:findbugs": {
             "locked": "3.0.1",
@@ -405,21 +449,25 @@
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-java": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -472,28 +520,32 @@
             "requested": "1.1.8"
         },
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-java": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
@@ -546,28 +598,32 @@
             "requested": "1.1.8"
         },
         "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.1",
-            "requested": "0.1.1"
+            "locked": "0.1.4",
+            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
         },
+        "com.google.inject:guice": {
+            "locked": "4.1.0",
+            "requested": "4.1.0"
+        },
         "io.cucumber:cucumber-core": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-java": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-jvm": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:cucumber-testng": {
-            "locked": "2.2.0",
-            "requested": "2.2.0"
+            "locked": "2.3.1",
+            "requested": "2.3.1"
         },
         "io.cucumber:gherkin": {
             "locked": "5.0.0",
