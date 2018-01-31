@@ -13,6 +13,7 @@ import gherkin.events.PickleEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,8 @@ public abstract class AbstractCucumberScenarioTest extends AbstractCucumberTest<
   @Override
   List<ScenarioWrapper> wrapEntities() {
     Map<CucumberFeature, List<PickleEvent>> scenariosMap = Arrays.stream(tlCukeRunner.get().provideScenarios())
+        .filter(Objects::nonNull)
+        .filter(objs -> objs.length == 2 && objs[0] != null && objs[1] != null)
         .map(objs ->
             new Pair<>(
                 ((CucumberFeatureWrapper) objs[1]).getCucumberFeature(),
