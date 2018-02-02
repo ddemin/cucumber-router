@@ -12,6 +12,8 @@ import com.github.ddemin.envrouter.base.EnvironmentsUtils;
 import com.github.ddemin.envrouter.base.EnvsLocksController;
 import com.github.ddemin.envrouter.base.TestEntitiesQueues;
 import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberFeatureTest;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.inject.Guice;
 import com.google.inject.Module;
 import cucumber.deps.com.thoughtworks.xstream.annotations.XStreamConverter;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import sun.reflect.annotation.AnnotationParser;
 
@@ -115,56 +118,28 @@ public class RouterCucumberCli extends AbstractCucumberFeatureTest {
     }
   }
 
-  private static void injectGuiceModules(List<String> modulesClassNames) {
-    List<Module> guiceModules = modulesClassNames.stream()
+  private static void injectGuiceModules(List<String> packagesNames) {
+    List<Module> guiceModules = packagesNames.stream()
+        .flatMap(RouterCucumberCli::getStreamOfClassesFrom)
+        .filter(Module.class::isAssignableFrom)
         .map(
-            name -> {
+            clz -> {
               try {
-                return RouterCucumberCli.class.getClassLoader().loadClass(name).newInstance();
-              } catch (ClassNotFoundException e) {
-                log.error("Can not to load Guice module class: " + name);
-                return null;
-              } catch (IllegalAccessException | InstantiationException e) {
-                log.error("Can not to instantiate Guice module class: " + name);
-                return null;
+                return (Module) clz.newInstance();
+              } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
               }
             }
         )
-        .filter(Objects::nonNull)
-        .filter(obj -> {
-          if (Module.class.isAssignableFrom(obj.getClass())) {
-            return true;
-          } else {
-            log.error("Object is not an instance of Guice module: " + obj.getClass().getName());
-            return false;
-          }
-        })
-        .map(obj -> (Module) obj)
         .collect(Collectors.toList());
     Guice.createInjector(guiceModules);
   }
 
-  private static void registerConverters(RuntimeOptions runtimeOptions, List<String> convertersClassNames) {
-    List<Annotation> converters = convertersClassNames.stream()
-        .map(
-            name -> {
-              try {
-                return RouterCucumberCli.class.getClassLoader().loadClass(name);
-              } catch (ClassNotFoundException e) {
-                log.warn("Can not to load converter class: " + name);
-                return null;
-              }
-            }
-        )
-        .filter(Objects::nonNull)
-        .filter(clz -> {
-          if (ConverterMatcher.class.isAssignableFrom(clz)) {
-            return true;
-          } else {
-            log.error("Object is not an instance of ConverterMatcher: " + clz.getClass().getName());
-            return false;
-          }
-        })
+  // TODO Check converters overlapping
+  private static void registerConverters(RuntimeOptions runtimeOptions, List<String> packagesNames) {
+    List<Annotation> convertersAnnotations = packagesNames.stream()
+        .flatMap(RouterCucumberCli::getStreamOfClassesFrom)
+        .filter(ConverterMatcher.class::isAssignableFrom)
         .map(
             converterClass -> {
               Map<String, Object> annPropertiesMap = new HashMap<>();
@@ -175,7 +150,7 @@ public class RouterCucumberCli extends AbstractCucumberFeatureTest {
         )
         .collect(Collectors.toList());
 
-    if (!converters.isEmpty()) {
+    if (!convertersAnnotations.isEmpty()) {
       try {
         Field field = runtimeOptions.getClass().getDeclaredField("converters");
 
@@ -184,7 +159,7 @@ public class RouterCucumberCli extends AbstractCucumberFeatureTest {
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
         field.setAccessible(true);
-        field.set(runtimeOptions, converters);
+        field.set(runtimeOptions, convertersAnnotations);
         field.setAccessible(false);
 
         modifiersField.setInt(field, field.getModifiers() & Modifier.FINAL);
@@ -192,6 +167,22 @@ public class RouterCucumberCli extends AbstractCucumberFeatureTest {
       } catch (Exception ex) {
         throw new RuntimeException(ex);
       }
+    }
+  }
+
+  private static Stream<Class<?>> getStreamOfClassesFrom(String packageOrClzFullName) {
+    try {
+      if (Thread.currentThread().getContextClassLoader()
+          .getResource(packageOrClzFullName.replace('.', '/')) != null) {
+        return ClassPath.from(RouterCucumberCli.class.getClassLoader())
+            .getTopLevelClassesRecursive(packageOrClzFullName)
+            .stream()
+            .map(ClassInfo::load);
+      } else {
+        return Stream.of(RouterCucumberCli.class.getClassLoader().loadClass(packageOrClzFullName));
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
