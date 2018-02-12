@@ -11,10 +11,6 @@
         }
     },
     "compile": {
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
-        },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
@@ -73,10 +69,6 @@
         }
     },
     "compileClasspath": {
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
-        },
         "com.google.code.findbugs:findbugs": {
             "locked": "3.0.1",
             "requested": "3.0.1"
@@ -139,10 +131,6 @@
         }
     },
     "default": {
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
-        },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
@@ -207,12 +195,12 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.7.10-SNAPSHOT"
+            "locked": "0.8.0"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.7.10-SNAPSHOT"
+            "locked": "0.8.0"
         }
     },
     "lombok": {
@@ -227,10 +215,6 @@
         }
     },
     "runtime": {
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
-        },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
@@ -289,10 +273,6 @@
         }
     },
     "runtimeClasspath": {
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
-        },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
@@ -358,10 +338,6 @@
         "ch.qos.logback:logback-core": {
             "locked": "1.1.8",
             "requested": "1.1.8"
-        },
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
@@ -436,10 +412,6 @@
         "ch.qos.logback:logback-core": {
             "locked": "1.1.8",
             "requested": "1.1.8"
-        },
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
         },
         "com.google.code.findbugs:findbugs": {
             "locked": "3.0.1",
@@ -519,10 +491,6 @@
             "locked": "1.1.8",
             "requested": "1.1.8"
         },
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
-        },
         "com.google.guava:guava": {
             "locked": "21.0",
             "requested": "21.0"
@@ -596,10 +564,6 @@
         "ch.qos.logback:logback-core": {
             "locked": "1.1.8",
             "requested": "1.1.8"
-        },
-        "com.github.ddemin:test-automation-utils": {
-            "locked": "0.1.4",
-            "requested": "0.1.4"
         },
         "com.google.guava:guava": {
             "locked": "21.0",
