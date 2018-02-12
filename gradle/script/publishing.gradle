@@ -13,15 +13,15 @@ apply plugin: com.bmuschko.gradle.nexus.NexusPlugin
 
 modifyPom {
     project {
-        name 'Tests threads router for Cucumber JVM'
-        description 'TBD'
-        url 'TBD'
+        name 'Parallel tests router'
+        description 'This library helps to route yours parallel tests to different environments and allows to use personal environment settings for each parallel test (java thread)'
+        url 'https://github.com/ddemin/tests-router/wiki'
         inceptionYear '2017'
 
         scm {
-            url 'TBD'
-            connection 'TBD'
-            developerConnection 'TBD'
+            url 'https://github.com/ddemin/tests-router/tree/master'
+            connection 'scm:git:git://github.com/ddemin/tests-router.git'
+            developerConnection 'scm:git:ssh://github.com:ddemin/tests-router.git'
         }
 
         licenses {
@@ -49,8 +49,11 @@ extraArchive {
 }
 
 nexus {
+    // Start gradle with -Psigning.keyId=  -Psigning.password= -Psigning.secretKeyRingFile=
+    // See http://central.sonatype.org/pages/gradle.html
     sign = true
+
+    // Start gradle with -PnexusUsername=someuser  -PnexusPassword=somepass
     repositoryUrl = System.getProperty("nexus.releases", "")
     snapshotRepositoryUrl = System.getProperty("nexus.snapshots", "")
-    // Start gradle with -PnexusUsername=someuser  -PnexusPassword=somepass
 }

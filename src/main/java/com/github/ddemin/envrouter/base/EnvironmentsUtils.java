@@ -2,8 +2,8 @@ package com.github.ddemin.envrouter.base;
 
 import com.github.ddemin.envrouter.RouterConfig;
 import com.github.ddemin.envrouter.cucumber2.testng.AbstractCucumberFeatureTest;
-import com.github.ddemin.testutil.io.FileSystemUtils;
-import com.github.ddemin.testutil.io.PropertiesUtils;
+import com.github.ddemin.envrouter.util.FileSystemUtils;
+import com.github.ddemin.envrouter.util.PropertiesUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;

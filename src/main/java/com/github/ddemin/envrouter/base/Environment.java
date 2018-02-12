@@ -1,6 +1,6 @@
 package com.github.ddemin.envrouter.base;
 
-import com.github.ddemin.testutil.io.PropertiesUtils;
+import com.github.ddemin.envrouter.util.PropertiesUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
 import java.util.Map;

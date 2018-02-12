@@ -1,6 +1,6 @@
 package com.github.ddemin.envrouter.demo;
 
-import static com.github.ddemin.testutil.allure2.AllureUtils.saveAsBrokenTest;
+import static com.github.ddemin.envrouter.util.AllureUtils.saveAsBrokenTest;
 import static java.lang.String.format;
 
 import com.github.ddemin.envrouter.base.EnvironmentLock;
